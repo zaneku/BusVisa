@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="BusVisa" />
+  <meta name="theme-color" content="#f5f8fc" />
+  <meta name="busvisa-build" content="v0.3.1-busvisa-beta" />
+  <script>try{if(localStorage.getItem("busvisa.beta.access.v1")==="yes")document.documentElement.classList.add("busvisa-unlocked")}catch(e){}</script>
+  <script>try{const m=localStorage.getItem("busvisa.theme.v1")||"system";const dark=m==="dark"||(m==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=dark?"dark":"light";}catch(e){document.documentElement.dataset.theme="light";}</script>
+  <link rel="canonical" href="https://visaatlas.netlify.app/" />
+  <meta name="description" content="护照和签证，点亮你的旅行地图。支持世界地图、旅行证件、各国入境方式。" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png?v=028" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico?v=028" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=028" />
+  <link rel="manifest" href="./manifest.webmanifest?v=028" />
+  <link rel="stylesheet" href="./style.css?v=032" />
+  <title>BusVisa · 签证地图</title>
+</head>
+<body>
+  <!-- UI-level beta invitation gate. Actual access control needs server-side verification. -->
+  <section id="beta-gate" class="beta-gate" aria-labelledby="beta-title">
+    <div class="beta-gate__top">
+      <span class="beta-gate__label" id="beta-label">PRIVATE BETA</span>
+      <label class="beta-gate__lang">
+        <span class="sr-only" id="beta-lang-label">选择语言</span>
+        <select id="beta-language" aria-labelledby="beta-lang-label">
+          <option value="zh-CN">简体中文</option>
+          <option value="zh-HK">繁體中文（香港）</option>
+          <option value="zh-TW">繁體中文（台灣）</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+    </div>
+    <div class="beta-gate__content">
+      <div class="beta-gate__brand"><img src="./icons/icon-192.png" alt="" width="90" height="90" /><span>BusVisa</span></div>
+      <div class="beta-gate__access"><span class="beta-gate__chip" id="beta-chip">邀请制内测</span><h1 id="beta-title">输入邀请码，开启旅行地图</h1><p id="beta-desc">BusVisa 目前仅向受邀用户开放。请输入邀请码以进入地图和签证功能。</p></div>
+      <form id="beta-form" class="beta-form" autocomplete="off">
+        <label for="beta-code" id="beta-input-label">邀请码</label>
+        <div class="beta-form__field">
+          <input id="beta-code" type="password" name="invitation" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" inputmode="text" required maxlength="80" placeholder="请输入邀请码" aria-describedby="beta-hint beta-error" />
+          <button id="beta-show" type="button" class="beta-form__eye" aria-label="显示邀请码">显示</button>
+        </div>
+        <p id="beta-error" class="beta-form__error" role="status" aria-live="polite"></p>
+        <button id="beta-submit" type="submit" class="beta-form__submit">验证并进入 <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="beta-gate__help"><span class="beta-gate__help-icon">✦</span><span id="beta-hint">验证成功后，本机将记住你的内测资格；无需每次重复输入。</span></div>
+    </div>
+    <footer class="beta-gate__footer"><span>BusVisa · v0.3.2 BETA</span><span id="beta-footer-text">仅供受邀用户测试 · Ku</span></footer>
+  </section>
+  <main id="app">
+    <section id="map-screen" class="screen screen--active" aria-label="签证地图">
+      <header class="page-header">
+        <div><p class="eyebrow">TRAVEL WITHOUT GUESSWORK</p><h1>我的旅行地图<span class="title-dot">.</span></h1></div>
+        <button id="search-toggle" class="icon-btn" aria-label="搜索国家" title="搜索国家">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"/><path d="m16 16 4.5 4.5"/></svg>
+        </button>
+      </header>
+
+      <div class="passport-quick" id="quick-passport" role="button" tabindex="0" aria-label="切换护照">
+        <span class="passport-quick__flag" id="quick-flag">🇨🇳</span>
+        <span><span class="passport-quick__label">当前护照</span><strong id="quick-passport-name">中国大陆</strong></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </div>
+
+      <div class="summary-strip">
+        <div class="summary-number"><span id="count-accessible">—</span><small>免签及潜在便利</small></div>
+        <div class="summary-line"></div>
+        <div class="summary-number"><span id="count-visa">0</span><small>已登记签证</small></div>
+        <div class="summary-line"></div>
+        <div class="summary-number"><span id="count-destinations">—</span><small>有数据目的地</small></div>
+      </div>
+
+      <section class="map-card" aria-label="可互动的世界地图">
+        <div class="map-card__top"><div><span class="map-eyebrow">WORLD ACCESS</span><h2>世界通行视图</h2></div><div class="map-card__live"><i></i><span>互动地图</span></div></div>
+        <div class="map-viewport" id="map-viewport">
+          <svg id="world-svg" viewBox="0 0 1000 510" preserveAspectRatio="xMidYMid meet" role="img" aria-label="世界地图，点击不同国家可查看入境条件">
+            <defs><pattern id="gridlines" width="100" height="85" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 85" fill="none" stroke="#a8bfd4" stroke-opacity=".17" stroke-width=".9" /></pattern></defs>
+            <rect x="0" y="0" width="1000" height="510" fill="url(#gridlines)"/>
+            <g id="map-layer"></g><g id="map-dots"></g>
+          </svg>
+          <div class="map-controls">
+            <button id="zoom-in" aria-label="放大地图">+</button>
+            <button id="zoom-out" aria-label="缩小地图">−</button>
+            <button id="zoom-reset" aria-label="复原地图">
+              <svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.5 7M3 4v7h7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="map-legend" id="map-legend">
+          <span><i class="legend-dot legend-free"></i>免签</span>
+          <span><i class="legend-dot legend-arrival"></i>落地签</span>
+          <span><i class="legend-dot legend-eta"></i>ETA</span>
+          <span><i class="legend-dot legend-conditional"></i>持签便利</span>
+          <span><i class="legend-dot legend-required"></i>需签证</span>
+        </div>
+      </section>
+      <div class="section-heading"><h2>入境规则</h2><span id="data-asof">数据加载中…</span></div>
+      <p class="hint-card" id="rules-notice">地图展示短期旅游入境方式。实际登机与入境以目的地官方规定及承运航司核验为准。</p>
+      <div class="bottom-padding"></div>
+    </section>
+
+    <section id="visa-screen" class="screen" aria-label="护照和签证">
+      <header class="page-header"><div><p class="eyebrow">YOUR TRAVEL DOCUMENTS</p><h1>签证与护照<span class="title-dot">.</span></h1></div><span class="header-glyph">✦</span></header>
+      <section class="section-panel passport-panel">
+        <span class="panel-label">MY PASSPORT</span>
+        <div class="passport-panel__row"><div class="passport-art"><span id="passport-flag">🇨🇳</span><div class="passport-art__title">PASSPORT</div><div class="passport-art__seal">✷</div></div>
+          <div class="passport-panel__details"><label for="passport-select">护照签发国家 / 地区</label><button type="button" id="passport-select" class="country-select" aria-label="搜索并选择护照国家">🇨🇳 中国大陆 <span>⌄</span></button><small>默认为中国大陆普通护照；可切换其他护照。</small></div>
+        </div>
+      </section>
+      <div class="section-heading section-heading--visa"><div><h2>我持有的签证</h2><span class="section-subtitle" id="visa-subtitle">添加签证类别会帮助判断潜在通行便利</span></div><button class="add-btn" id="add-visa-button"><span>＋</span> 添加签证</button></div>
+      <div id="visa-list" class="visa-list"></div>
+      <section class="section-panel utility-panel"><h3>数据与说明</h3><p>护照基础签证数据可在线加载，并在本机缓存。在线同步第三方护照通行政策并缓存到本机；持第三国签证的便利属于条件性提示，并不自动保证符合签证有效性或签证类别限制。</p><button id="refresh-dataset" class="secondary-btn">立即在线检查政策 <span id="sync-progress"></span></button><small id="sync-diagnostic" style="display:block;margin-top:10px;color:#44627b;line-height:1.6">可点击上方按钮开始检查数据源。</small><small id="data-source-note">来源：TravelRequirements.info（CC BY 4.0）与本地规则库。具体来源及核验日期在目的地详情显示。</small></section>
+      <section class="section-panel change-panel"><div class="change-panel__head"><h3>政策变更记录</h3><span id="last-sync-label">未同步</span></div><p>仅比较两次成功同步的护照入境矩阵。显示的是来源数据变化，不保证官方政策在同一时间生效。</p><div id="changes-list" class="changes-list"><p class="changes-empty">完成两次同步后，这里将列出有变化的目的地。</p></div></section>
+      <section class="section-panel about-entry-panel" aria-label="关于 BusVisa">
+        <button type="button" id="about-open" class="about-entry" aria-label="设置"><span class="about-entry__icon">⚙</span><span class="about-entry__copy"><strong>设置</strong><small id="about-language-summary">跟随系统 · 简体中文 · v0.3.1</small></span><span class="about-entry__chevron">›</span></button>
+      </section>
+      <div class="bottom-padding"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="底部导航">
+    <button class="nav-tab active" id="tab-map" aria-label="地图" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>
+      <span>地图</span>
+    </button>
+    <button class="nav-tab" id="tab-visas" aria-label="签证">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h7M7 17h5"/></svg>
+      <span>签证</span>
+    </button>
+  </nav>
+
+  <div id="country-sheet" class="country-sheet" aria-hidden="true">
+    <div class="sheet-grip"></div>
+    <div class="country-sheet__header"><div><span id="country-continent" class="panel-label">目的地</span><h2 id="country-name">—</h2><p id="country-en">—</p></div><button id="country-close" class="close-btn" aria-label="关闭">×</button></div>
+    <div class="country-sheet__status"><span class="status-pill" id="country-status">—</span><strong id="country-days">—</strong></div>
+    <div class="country-sheet__body"><p id="country-mode"></p><div class="detail-heading">入境条件</div><p id="country-conditions"></p><p id="country-note" class="country-note"></p>
+      <details id="country-original" class="original-policy" hidden><summary>原始政策记录（简体中文）</summary><p id="country-original-text"></p></details>
+      <section id="arrival-fee" class="arrival-fee" hidden aria-label="落地签费用">
+        <div class="arrival-fee__head"><h3>落地签费用</h3><button type="button" id="refresh-fee" class="fee-refresh">刷新人民币参考价 ↻</button></div>
+        <div id="arrival-fee-list" class="arrival-fee__list"><p>正在读取官方费用记录…</p></div>
+        <p id="fee-update-note" class="fee-update-note">费用和汇率以各自来源及日期为准。</p>
+      </section>
+      <a id="country-source" href="#" target="_blank" rel="noopener noreferrer">查看参考来源 ↗</a></div>
+  </div>
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <section id="search-modal" class="floating-modal" role="dialog" aria-label="搜索目的地" aria-hidden="true"><div class="modal-head"><h2>搜索目的地</h2><button class="close-btn" id="search-close" aria-label="关闭">×</button></div><input type="search" id="country-search" autocomplete="off" placeholder="英文、简体、繁体、ISO代码" /><div id="search-results" class="search-results"></div></section>
+
+  <section id="visa-modal" class="floating-modal visa-modal" role="dialog" aria-label="添加签证" aria-hidden="true"><div class="modal-head"><h2 id="visa-modal-title">添加签证</h2><button class="close-btn" id="visa-close" aria-label="关闭">×</button></div>
+    <form id="visa-form">
+      <label class="field"><span>签发国家 / 地区</span><button class="country-select" type="button" id="visa-issuer" aria-label="搜索并选择签证签发国家">🇺🇸 美国 <span>⌄</span></button></label>
+      <label class="field"><span>该签发国家的签证类型</span><select id="visa-type" name="type" required></select></label>
+      <label class="field" id="custom-type-field" hidden><span>签证原始类别 / 代码</span><input id="visa-custom-type" name="customType" type="text" maxlength="80" placeholder="按签证文件填写（例如 B1/B2）" /></label>
+      <p id="type-source-note" class="type-source-note"></p>
+      <p id="type-fetch-note" class="type-fetch-note" aria-live="polite"></p>
+      <p class="form-notice">本 App 不记录、不验证签证有效期。登记签证后仅显示可能适用的入境便利；实际是否符合条件，仍需核实签证有效期、入境次数和该目的地对签证类别的限制。</p>
+      <button class="primary-btn" type="submit">保存并更新地图</button>
+    </form>
+  </section>
+
+  <section id="about-modal" class="floating-modal about-modal" role="dialog" aria-label="设置" aria-hidden="true">
+    <div class="modal-head"><h2>设置</h2><button id="about-close" class="close-btn" type="button" aria-label="关闭">×</button></div>
+    <div class="about-scroll">
+      <section class="about-block settings-appearance" aria-label="外观">
+        <h3>外观</h3><p class="about-muted">选择背景模式</p>
+        <div id="theme-mode-options" class="theme-mode-options" role="radiogroup" aria-label="外观模式">
+          <button type="button" data-theme-choice="system" role="radio" aria-checked="false"><span class="theme-mode-icon" aria-hidden="true">◐</span><span>跟随系统</span><span class="theme-mode-check" aria-hidden="true"></span></button>
+          <button type="button" data-theme-choice="light" role="radio" aria-checked="false"><span class="theme-mode-icon" aria-hidden="true">☀</span><span>浅色模式</span><span class="theme-mode-check" aria-hidden="true"></span></button>
+          <button type="button" data-theme-choice="dark" role="radio" aria-checked="false"><span class="theme-mode-icon" aria-hidden="true">☾</span><span>深色模式</span><span class="theme-mode-check" aria-hidden="true"></span></button>
+        </div>
+      </section>
+      <section class="about-block"><h3>语言</h3><p class="about-muted">选择界面语言</p>
+        <div id="about-language-options" class="about-language-options" role="radiogroup" aria-label="选择界面语言">
+          <button type="button" role="radio" data-lang="zh-CN" aria-checked="false"><span>简体中文</span><span class="lang-check"></span></button>
+          <button type="button" role="radio" data-lang="zh-HK" aria-checked="false"><span>繁体中文（香港）</span><span class="lang-check"></span></button>
+          <button type="button" role="radio" data-lang="zh-TW" aria-checked="false"><span>繁体中文（台湾）</span><span class="lang-check"></span></button>
+          <button type="button" role="radio" data-lang="en" aria-checked="false"><span>English</span><span class="lang-check"></span></button>
+        </div>
+        <p id="language-saved" class="about-saved" aria-live="polite"></p>
+      </section>
+      <details id="settings-about-details" class="settings-about-details">
+        <summary>关于 BusVisa <span aria-hidden="true">›</span></summary>
+        <div class="settings-about-content">
+          <div class="about-hero"><img src="./icons/icon-192.png" width="68" height="68" alt="BusVisa" /><div><strong>BusVisa</strong><span>v0.3.2 BETA</span><a class="about-site-url" href="https://visaatlas.netlify.app/" target="_blank" rel="noopener noreferrer">visaatlas.netlify.app</a></div></div>
+          <section class="about-block about-project-block" aria-label="作者与项目">
+            <h3>作者与项目</h3>
+            <div class="about-detail-row"><span>作者</span><strong>Ku</strong></div>
+            <div class="about-detail-row"><span>GitHub 项目</span><a href="https://github.com/zaneku/BusVisa" target="_blank" rel="noopener noreferrer" aria-label="打开 GitHub 项目">github.com/zaneku/BusVisa ↗</a></div>
+          </section>
+          <section class="about-block"><h3>数据来源</h3><p><a href="https://travelrequirements.info/data/" target="_blank" rel="noopener noreferrer">TravelRequirements.info — Entry Requirements Dataset (CC BY 4.0)</a></p><p><a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter — FX reference rates</a></p></section>
+          <section class="about-block"><h3>隐私与存储</h3><p>签证记录与语言偏好仅保存在本机浏览器，不要求注册账号。清除网站数据可能删除这些记录。</p></section>
+          <div class="legal-disclaimer" role="note" aria-label="使用说明与免责声明">
+            <section class="about-block"><h3>使用说明与免责声明</h3><h4>服务性质及信息准确性</h4><p>BusVisa 由 Ku 独立开发，并非任何政府、使领馆、移民管理机关、航空公司或签证服务机构的官方产品。本应用展示的免签、落地签、电子签、第三国签证便利、签证类型、停留期限、费用及汇率等信息仅供一般参考，不构成法律、移民、旅行或其他专业建议，也不构成任何登机、获签、入境或停留保证。数据可能存在错误、遗漏、延迟或变动，使用前必须自行向目的地官方主管机关和承运人核实最新规定及全部适用条件。</p></section>
+            <section class="about-block"><h4>旅行风险与责任限制</h4><p>任何签证申请、购票、出行、过境及入境决定均由使用者自行作出并承担风险。在适用法律允许的最大范围内，开发者不对因使用、无法使用或依赖本应用而引起的拒签、拒绝登机、拒绝入境、遣返、滞留、航班或住宿取消、改签费用、汇率差额、其他经济损失、间接损失、数据丢失或服务中断承担责任。</p></section>
+            <section class="about-block legal-minors"><h4>未成年人使用与监护责任</h4><p>依使用所在地适用法律属于未成年人的用户，应在父母或其他法定监护人同意、指导和监督下使用 BusVisa，不应仅凭本应用的信息独立作出跨境出行决定。监护人应自行核对未成年人的护照、签证、出入境手续、陪同或监护证明及其他特殊要求，并对相关旅行安排作出适当判断。在适用法律允许的范围内，开发者不对未成年人或监护人因使用或依赖本应用信息所产生的旅行及经济损失承担责任。</p></section>
+            <section class="about-block legal-statutory"><h4>法定权利与不可免责事项</h4><p>上述免责及责任限制仅在适用法律允许的范围内有效，不限制未成年人或其他使用者依法享有的权利，也不排除依法不得排除的责任。不同国家或地区的法律可能影响本声明的效力。</p></section>
+          </div>
+        </div>
+      </details>
+      <button id="about-return" type="button" class="secondary-btn about-return">完成</button>
+    </div>
+  </section>
+  <div id="picker-backdrop" class="picker-backdrop" aria-hidden="true"></div>
+  <section id="country-picker-modal" class="floating-modal country-picker-modal" role="dialog" aria-label="选择国家或地区" aria-modal="true" aria-hidden="true">
+    <div class="modal-head"><h2 id="picker-title">选择国家 / 地区</h2><button class="close-btn" id="picker-close" type="button" aria-label="关闭">×</button></div>
+    <label class="picker-search-label" for="picker-search">可输入简体中文、繁体中文或英文</label>
+    <input id="picker-search" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="例如：Germany / 德国 / 德國" />
+    <p id="picker-results-count" class="picker-count" aria-live="polite"></p>
+    <div id="picker-results" class="picker-results" role="listbox"></div>
+  </section>
+  <script defer src="./country-search.js?v=029"></script>
+  <script defer src="./i18n.js?v=032"></script>
+  <script defer src="./theme.js?v=032"></script>
+  <script defer src="./policy-engine.js"></script>
+  <script defer src="./fee-engine.js"></script>
+  <script defer src="./beta-gate.js?v=032"></script>
+  <script defer src="./app.js?v=032"></script>
+</body>
+</html>
