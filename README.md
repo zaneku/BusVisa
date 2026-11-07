@@ -16,7 +16,7 @@ An independent, mobile-first global visa access map. Current prototype is a stat
 - 首页增加四语言邀请码验证界面：**简体中文、繁體中文（香港）、繁體中文（台灣）、English**。
 - 输入邀请码后解锁应用，验证结果只保存在该设备 / 浏览器的 `localStorage`。未解锁前不初始化地图和在线政策同步。
 - 验证不修改已有 `va.v2.visas`、`va.passport` 等用户记录。
-- **安全说明：本实现是客户端内测入口，并非真正的服务器端访问控制。** 静态网站公开可下载，技术用户可以绕过此 UI。若需要严格控制访问，请用 Netlify Identity / Edge Functions + 服务端权限校验及限制数据获取。
+- **安全说明：本实现是客户端内测入口，并非真正的服务器端访问控制。** 
 
 ## 主要功能 / Features
 
