@@ -1,0 +1,221 @@
+:root{--bg:#f5f8fc;--ink:#14243b;--muted:#7b8ba1;--navy:#102645;--accent:#2565c6;--line:#e5edf5;--green:#38aa8b;--gold:#e6ad53;--blue:#639ecf;--purple:#9c8be5;--grey:#cbd5e2;--pink:#e29aab;--white:#fff;--safe:env(safe-area-inset-bottom,0px);font-synthesis:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:16px}body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Noto Sans SC",sans-serif;background:var(--bg);color:var(--ink);overscroll-behavior:none}
+button,select,input{font-family:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}
+#app{width:min(100%,600px);margin:auto;min-height:100vh;position:relative}
+.screen{display:none;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 0}.screen--active{display:block}
+.page-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:2.0px;color:#7a8ba3;margin:0 0 8px}.page-header h1{font-size:29px;line-height:1.2;letter-spacing:-.75px;margin:0;font-weight:800}.title-dot{color:var(--accent)}
+.icon-btn{display:grid;place-items:center;border:1px solid #e5ecf6;background:white;box-shadow:0 7px 16px #17365c0a;width:45px;height:45px;border-radius:16px;color:var(--ink)}.icon-btn svg{width:21px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round}.header-glyph{font-size:31px;color:#4178cf}
+.passport-quick{display:flex;align-items:center;gap:11px;background:white;padding:12px 14px;border-radius:18px;border:1px solid #e8eff8;box-shadow:0 8px 22px #14243b05;outline-offset:4px}.passport-quick__flag{font-size:28px}.passport-quick__label{display:block;font-size:11px;color:#8190a6;margin-bottom:1px}.passport-quick strong{display:block;font-size:15px}.passport-quick>svg{margin-left:auto;width:17px;stroke:#99aabe;stroke-width:2.4;fill:none;stroke-linecap:round}
+.summary-strip{display:flex;align-items:center;justify-content:space-around;gap:8px;margin:25px 3px 20px}.summary-number{min-width:0;text-align:center}.summary-number>span{display:block;font-size:26px;letter-spacing:-1.1px;font-weight:800;line-height:1}.summary-number>small{display:block;margin-top:7px;font-size:10.5px;color:#8190a4;white-space:nowrap}.summary-line{height:33px;width:1px;background:#dde6f0}
+.map-card{position:relative;border:1px solid #dce8f3;background:linear-gradient(165deg,#e8f4fb,#dbeaf5 66%,#d6e8f6);border-radius:25px;overflow:hidden;box-shadow:0 14px 40px #18395712}.map-card__top{display:flex;justify-content:space-between;padding:21px 21px 6px;align-items:flex-start}.map-eyebrow{font-size:9px;font-weight:800;letter-spacing:1.7px;color:#7b98b2}.map-card__top h2{margin:5px 0;font-size:20px;font-weight:800}.map-card__live{display:flex;align-items:center;gap:5px;font-size:10px;color:#5586a4;background:#ffffffa8;padding:7px 10px;border-radius:100px}.map-card__live i{height:6px;width:6px;background:#42b88c;border-radius:50%;box-shadow:0 0 0 4px #42b88c1a}
+.map-viewport{height:clamp(250px,33vh,305px);position:relative;touch-action:none;overflow:hidden}.map-viewport svg{display:block;width:100%;height:100%;touch-action:none;user-select:none}.land{stroke:#ffffffba;stroke-width:.92;fill:#c8d3df;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .18s ease}.land:focus{stroke:#172a44;outline:0}.land.selected{stroke:#203557;stroke-width:2.6}.land.status-free,.map-dot.status-free{fill:var(--green)}.land.status-arrival,.map-dot.status-arrival{fill:var(--gold)}.land.status-eta,.map-dot.status-eta{fill:var(--blue)}.land.status-conditional,.map-dot.status-conditional{fill:var(--purple)}.land.status-held,.map-dot.status-held{fill:#5275d1}.land.status-limited,.map-dot.status-limited{fill:#a48ccd}.land.status-evisa,.map-dot.status-evisa{fill:var(--pink)}.land.status-required,.map-dot.status-required{fill:#c5d0df}.land.status-denied,.map-dot.status-denied{fill:#909eb1}.land.status-unknown,.map-dot.status-unknown{fill:#cbd6e3}.map-dot{stroke:white;stroke-width:1.1;cursor:pointer}.map-controls{position:absolute;right:15px;bottom:17px;display:grid;background:#ffffffd9;border-radius:15px;overflow:hidden;box-shadow:0 4px 16px #32658c20;backdrop-filter:blur(12px)}.map-controls button{width:37px;height:36px;border:0;border-bottom:1px solid #e8eef3;background:transparent;font-size:22px;color:#304b63}.map-controls button:last-child{border-bottom:0}.map-controls svg{width:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.map-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:9px 14px;padding:17px 17px 20px;border-top:1px solid #c9dceab0;font-size:10px;font-weight:600;color:#627c94}.map-legend>span{display:flex;align-items:center;gap:5px}.legend-dot{width:8px;height:8px;border-radius:50%}.legend-free{background:var(--green)}.legend-arrival{background:var(--gold)}.legend-eta{background:var(--blue)}.legend-conditional{background:var(--purple)}.legend-required{background:var(--grey)}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 1px 11px}.section-heading h2{font-size:17px;letter-spacing:-.25px;margin:0}.section-heading>span{font-size:10px;color:#8da0b4}.hint-card{font-size:12px;color:#7489a2;line-height:1.7;padding:14px 16px;background:#fff;border-radius:15px;border:1px solid var(--line);margin:0}
+.bottom-nav{z-index:60;position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:0;background:#fffefeea;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid #e8edf4;box-shadow:0 -7px 28px #1e395508;padding-bottom:var(--safe);min-height:calc(65px + var(--safe))}.nav-tab{width:min(50%,300px);background:transparent;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 9px;color:#91a1b3;font-size:11px;font-weight:650}.nav-tab.active{color:#2963bc}.nav-tab svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.nav-tab.active svg{stroke-width:2.3}.bottom-padding{height:calc(80px + var(--safe))}
+.section-panel{background:white;border:1px solid #e6edf5;border-radius:21px;box-shadow:0 8px 20px #14243b05;padding:19px;margin-bottom:17px}.panel-label{font-size:10px;font-weight:800;letter-spacing:1.5px;color:#8595aa}.passport-panel__row{display:flex;gap:16px;align-items:center;margin-top:16px}.passport-art{position:relative;flex:0 0 116px;height:145px;border-radius:13px;background:linear-gradient(145deg,#1c446a,#122a4c 60%,#19395e);color:#e8bc73;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #789ec750,3px 8px 17px #14243b28}.passport-art>span{font-size:30px;filter:saturate(.9)}.passport-art__title{font-weight:750;letter-spacing:2.2px;font-size:12px;margin-top:12px}.passport-art__seal{font-size:32px;opacity:.35;position:absolute;bottom:10px}.passport-panel__details{min-width:0;flex:1}.passport-panel__details label{display:block;font-size:11px;font-weight:750;color:#6f7f94;margin-bottom:9px}.passport-panel__details select{width:100%;max-width:100%;border:1px solid #dbe5f0;border-radius:12px;background:#f7f9fd;padding:11px 8px;font-size:13px;font-weight:650;color:var(--ink)}.passport-panel__details small{display:block;font-size:11px;line-height:1.6;color:#8291a5;margin-top:11px}
+.section-heading--visa{align-items:center;margin-top:27px;margin-bottom:14px}.section-subtitle{display:block;font-size:11px;color:#8fa0b4;margin-top:5px}.add-btn{border:0;background:#1b5db7;color:white;border-radius:12px;font-weight:700;font-size:12px;padding:11px 13px;white-space:nowrap;box-shadow:0 5px 12px #2763b524}.add-btn span{font-size:18px;vertical-align:-1px;margin-right:3px}.visa-list{display:grid;gap:11px}.visa-card{background:#fff;border:1px solid #e5ecf5;border-radius:18px;padding:15px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 14px #14243b05}.visa-badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:#eff5fc;flex-shrink:0}.visa-card__text{min-width:0;flex:1}.visa-card h3{font-size:14px;margin:0 0 4px}.visa-card p{font-size:11px;color:#8898a9;margin:0 0 5px}.visa-card__chips{display:flex;gap:7px;flex-wrap:wrap}.tiny-chip{font-size:9px;background:#eaf6ef;color:#35895c;border-radius:50px;padding:3px 7px}.tiny-chip.expired{background:#fdecec;color:#c67474}.tiny-chip.other{background:#e9effa;color:#6685b8}.card-actions{display:flex;gap:4px}.subtle-icon{background:transparent;border:0;padding:8px 5px;color:#9cacbd;font-size:14px}.empty-state{text-align:center;background:white;border:1px dashed #dbe5ef;border-radius:20px;padding:35px 18px;color:#8798ab}.empty-state__icon{display:grid;place-items:center;font-size:31px;background:#f0f5fc;margin:0 auto 16px;width:70px;height:70px;border-radius:50%}.empty-state h3{font-size:15px;color:var(--ink);margin:0 0 7px}.empty-state p{font-size:12px;margin:0;line-height:1.7}.utility-panel{margin-top:24px}.utility-panel h3{font-size:14px;margin:0 0 7px}.utility-panel p{font-size:11px;line-height:1.75;color:#8292a6;margin:0 0 13px}.utility-panel small{display:block;line-height:1.55;color:#9aabb9;font-size:10px;margin-top:13px}.secondary-btn{background:#f0f5fb;border:1px solid #d7e4f3;color:#386fba;border-radius:12px;padding:11px 14px;font-size:12px;font-weight:700}
+.overlay{display:none;position:fixed;inset:0;background:#0e233f6b;z-index:80;backdrop-filter:blur(2px)}.overlay.visible{display:block}
+.country-sheet{display:none;position:fixed;z-index:100;left:50%;bottom:calc(65px + var(--safe) + 8px);transform:translateX(-50%);width:min(calc(100% - 24px),570px);max-height:min(66vh,530px);overflow:auto;background:#fff;border-radius:25px;box-shadow:0 15px 45px #15253e4d;padding:8px 22px 20px}.country-sheet.visible{display:block}.sheet-grip{width:34px;height:4px;background:#d8e0e8;margin:0 auto 16px;border-radius:8px}.country-sheet__header{display:flex;justify-content:space-between;gap:16px}.country-sheet__header h2{margin:5px 0 0;font-size:25px}.country-sheet__header p{margin:1px 0 0;color:#9baabd;font-size:11px}.close-btn{border:none;background:#eef3f8;color:#6a7b8c;width:31px;height:31px;border-radius:50%;display:grid;place-items:center;font-size:22px;line-height:1}.country-sheet__status{display:flex;align-items:center;gap:11px;margin:20px 0 10px;flex-wrap:wrap}.country-sheet__status strong{font-size:13px;color:#223b58}.status-pill{font-size:11px;color:#fff;border-radius:8px;padding:7px 9px;background:#7f91a6;font-weight:700}.status-pill.status-free{background:var(--green)}.status-pill.status-arrival{background:var(--gold)}.status-pill.status-eta{background:var(--blue)}.status-pill.status-held{background:#5275d1}.status-pill.status-conditional{background:var(--purple)}.status-pill.status-evisa{background:var(--pink)}.status-pill.status-limited{background:#9e88ce}.status-pill.status-required{background:#8394a9}.country-sheet__body{font-size:12px;color:#576e85;line-height:1.7}.country-sheet__body>p{margin:10px 0}.detail-heading{font-weight:800;color:#233a57;font-size:12px;margin-top:16px}.country-note{background:#f3f7fc;padding:10px 12px;border-radius:12px;color:#738ba2}.country-sheet__body a{color:#296bb9;display:inline-block;margin:3px 0;font-size:11px;text-decoration:none}
+.floating-modal{display:none;z-index:90;position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 20px);transform:translateX(-50%);width:min(calc(100% - 28px),470px);max-height:calc(92vh - env(safe-area-inset-top,0px));overflow:auto;border-radius:24px;background:white;padding:20px;box-shadow:0 20px 55px #17294445}.floating-modal.visible{display:block}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{font-size:20px;margin:0}.floating-modal input[type=search],.field input,.field select{width:100%;outline:none;padding:13px 12px;border-radius:12px;background:#f7f9fc;border:1px solid #dce6f0;color:var(--ink);font-size:14px}.floating-modal input:focus,.field select:focus{border-color:#8eaede;box-shadow:0 0 0 2px #8eaede28}.search-results{margin-top:12px;max-height:58vh;overflow:auto}.search-row{width:100%;border:0;background:white;display:flex;align-items:center;gap:10px;text-align:left;padding:12px 6px;border-bottom:1px solid #eef3f7}.search-row>span:first-child{font-size:23px}.search-row strong{font-size:13px}.search-row small{display:block;margin-top:3px;color:#8999ac;font-size:10px}.search-row .search-pill{margin-left:auto;font-size:10px;color:#7e93a9;background:#f2f6fa;padding:6px;border-radius:8px}.field{display:block;margin-bottom:15px}.field>span{display:block;font-size:11px;font-weight:700;color:#647a91;margin-bottom:7px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form-notice{font-size:11px;line-height:1.65;color:#8797a8;margin:7px 0 17px}.primary-btn{border:0;border-radius:14px;background:#205db0;color:white;padding:14px;width:100%;font-weight:750;font-size:14px}
+@media(min-width:720px){body{background:linear-gradient(90deg,#e7eff8 0%,#f5f8fc 50%,#e7eff8 100%)}#app{background:var(--bg);box-shadow:0 0 60px #15365512}.bottom-nav{width:600px;left:calc(50% - 300px);right:auto}.screen{padding:30px 26px 0}.map-viewport{height:380px}}
+@media(max-height:710px){.map-viewport{height:255px}.page-header{margin-bottom:15px}.summary-strip{margin:17px 2px 15px}.country-sheet{max-height:62vh}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* V2: country-specific visa types; no dates required or stored. */
+.type-source-note{font-size:11px;line-height:1.6;color:#6f849a;margin:-4px 0 16px}
+.type-source-note a{color:#2869ba;text-decoration:underline;text-underline-offset:2px}
+.field[hidden]{display:none!important}
+.change-panel{margin-top:14px}.change-panel__head{display:flex;justify-content:space-between;align-items:center;gap:12px}.change-panel__head h3{margin:0}.change-panel__head span{font-size:10px;color:#8197ae}.changes-list{display:grid;gap:8px}.change-row{display:flex;align-items:center;gap:10px;border:1px solid #e8eef4;border-radius:10px;padding:10px;background:#f9fbfe}.change-row .change-flag{font-size:20px}.change-row strong{font-size:12px}.change-row small{display:block;font-size:10px;color:#7e91a4;margin-top:2px}.change-row a{margin-left:auto;font-size:11px;color:#356fb7}.changes-empty{margin:0!important;color:#8291a6}.data-freshness{font-weight:700}
+/* V2: arrival-visa costs and reference FX rates */
+.arrival-fee{margin:16px 0 12px;padding:14px;border:1px solid #dce9f5;background:#f7faff;border-radius:15px}
+.arrival-fee[hidden]{display:none!important}
+.arrival-fee__head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.arrival-fee h3{margin:0;font-size:13px;font-weight:800;color:#23405e}
+.fee-refresh{border:1px solid #cfdfee;background:white;color:#2567b3;font-size:10.5px;border-radius:9px;padding:6px 9px;font-weight:700}
+.arrival-fee__list{display:grid;gap:9px;margin-top:12px}
+.arrival-fee__list>p{font-size:11px;color:#8496a8}
+.fee-entry{border:1px solid #e0eaf6;border-radius:12px;padding:12px;background:white}
+.fee-entry h4{margin:0 0 7px;font-size:12px}
+.fee-entry__official{font-size:14px;color:#142b47;font-weight:850}
+.fee-entry__currency{font-size:12px;color:#36618a;margin-top:5px}
+.fee-entry__cny{margin-top:6px;color:#1a6b56;font-size:14px;font-weight:850}
+.fee-entry__small{font-size:10.5px;color:#7b8da3;line-height:1.55;margin-top:6px}
+.fee-entry a{font-size:10.5px;color:#3270bf;display:inline-block;margin-top:6px}
+.fee-update-note{margin:9px 0 0;font-size:10px;color:#8595a6;line-height:1.6}
+
+/* v0.2.5 searchable country/pasport picker and adaptive visa types */
+button.country-select{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:10px;min-height:44px;padding:11px 13px;border:1px solid #dbe5f0;border-radius:13px;background:#f7faff;color:#1a3455;font-weight:700;font-size:13px;line-height:1.5;cursor:pointer}
+button.country-select>span:last-child{font-size:17px;color:#8fa2b6}
+button.country-select:focus-visible{outline:2px solid #3778c5;outline-offset:2px}
+.picker-backdrop{position:fixed;inset:0;background:#0c254d9f;z-index:99;backdrop-filter:blur(3px);display:none}.picker-backdrop.visible{display:block}
+/* The country selector is a single constrained scroll region on iOS Safari. */
+.country-picker-modal{z-index:101!important;display:none;flex-direction:column;overflow:hidden;
+  height:min(82dvh,740px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 36px)}
+.country-picker-modal.visible{display:flex}
+.country-picker-modal .modal-head,.country-picker-modal .picker-search-label,.country-picker-modal #picker-search,.country-picker-modal .picker-count{flex-shrink:0}
+.picker-search-label{display:block;color:#7d90a6;font-size:11px;margin:3px 0 8px;font-weight:650}
+#picker-search{width:100%;font-size:16px;min-height:45px;border-radius:13px;border:1px solid #d6e2f0;padding:10px 12px;background:#f7f9fd}
+#picker-search:focus{outline:2px solid #91b8ed;outline-offset:1px}
+.picker-count{color:#8ba0b6;font-size:11px;margin:10px 0 3px}
+.picker-results{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
+.picker-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 5px;border:0;border-bottom:1px solid #edf2f7;background:white;text-align:left;cursor:pointer;border-radius:8px}
+.picker-row:focus-visible,.picker-row:hover{background:#eff6ff;outline:none}
+.picker-row__flag{font-size:23px;flex:0 0 31px}.picker-row__names{min-width:0;flex:1}.picker-row__names strong{display:block;font-size:14px;color:#1c3450}.picker-row__names small{display:block;white-space:normal;font-size:11px;margin-top:4px;color:#8497aa;line-height:1.4}.picker-row__mark{font-size:16px;color:#2574d2}
+.search-results .search-row__third{color:#7a91ac;font-size:10px}
+.type-fetch-note{font-size:11px;color:#7d92aa;line-height:1.6;margin:5px 0 10px}
+.type-fetch-note.success{color:#176b50}
+@media(max-width:380px){.passport-art{flex:0 0 90px;height:122px}.country-picker-modal{padding:14px}}
+
+/* v0.2.6 About and four-language preferences */
+.about-entry-panel{padding:0!important;overflow:hidden}
+.about-entry{display:flex;align-items:center;gap:13px;min-height:71px;width:100%;background:transparent;border:0;text-align:left;padding:12px 17px;color:#233951;cursor:pointer}
+.about-entry__icon{width:38px;height:38px;flex:0 0 38px;border-radius:13px;background:#e7f0fb;color:#286bb8;display:grid;place-items:center;font-weight:900;font-size:21px}
+.about-entry__copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.about-entry__copy strong{font-size:15px}.about-entry__copy small{font-size:11px;color:#7d8c9e}
+.about-entry__chevron{font-size:27px;color:#a9b8c8}
+.about-modal{max-height:85dvh;overflow:hidden;display:none;flex-direction:column}.about-modal.visible{display:flex}
+.about-scroll{overflow-y:auto;overscroll-behavior:contain;padding:0 1px 12px}
+.about-hero{display:flex;align-items:center;gap:14px;padding:12px 2px 18px}.about-hero img{border-radius:17px;object-fit:cover;box-shadow:0 3px 14px #2d609633}.about-hero div{display:flex;flex-direction:column;gap:5px}.about-hero strong{font-size:21px;color:#18365c}.about-hero span{color:#8295aa;font-size:12px}
+.about-block{border-top:1px solid #e9eef5;padding:15px 0 13px}.about-block h3{margin:0 0 11px;font-size:15px;color:#1e3554}.about-block p{font-size:12px;line-height:1.7;color:#566c84;margin:9px 0}.about-block a{color:#286dc3;overflow-wrap:anywhere}
+.about-muted{font-size:12px;color:#8194a8!important;margin-top:-5px!important}
+.about-language-options{border:1px solid #e2eaf3;border-radius:15px;overflow:hidden;background:#fff}
+.about-language-options button{display:flex;width:100%;justify-content:space-between;align-items:center;min-height:49px;background:#fff;border:0;border-bottom:1px solid #eef2f8;padding:11px 14px;font-size:14px;color:#243e5c;text-align:left;cursor:pointer}
+.about-language-options button:last-child{border-bottom:none}.about-language-options button[aria-checked="true"]{background:#eff6ff;color:#1765bf;font-weight:700}
+.lang-check{width:20px;text-align:right}.about-language-options button[aria-checked="true"] .lang-check::after{content:'✓';color:#216dc0;font-weight:800}
+.about-saved{color:#247350!important;font-size:11px!important;min-height:14px}.about-return{display:block;width:100%;margin:13px 0 4px}
+
+.original-policy{margin:12px 0;border:1px solid #e3ebf5;border-radius:11px;background:#f5f8fc;padding:10px 12px}.original-policy summary{font-size:12px;color:#3775bb;font-weight:700;cursor:pointer}.original-policy p{font-size:11px;color:#71839b;line-height:1.7;white-space:pre-wrap}
+
+.about-site-url{font-size:12px;color:#286dc3;text-decoration:none;overflow-wrap:anywhere}
+
+/* BusVisa 0.2.8 — About: author and GitHub repository */
+.about-project-block{padding-top:14px}
+.about-detail-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid #f0f3f8;font-size:13px}
+.about-detail-row:last-child{border-bottom:0}
+.about-detail-row>span{flex:0 0 auto;color:#61758c}
+.about-detail-row strong{color:#173659;font-size:14px}
+.about-detail-row a{text-align:right;font-size:12px;font-weight:600;overflow-wrap:anywhere;word-break:break-word}
+
+/* v0.2.9: complete country list (no Guam cutoff), scrollable iPhone picker. */
+
+
+/* BusVisa v0.3.0 – invitation-only beta entrance. A client-only UI gate, not a security boundary. */
+html:not(.busvisa-unlocked) #app,html:not(.busvisa-unlocked) .bottom-nav,
+html:not(.busvisa-unlocked) .country-sheet,html:not(.busvisa-unlocked) .overlay,
+html:not(.busvisa-unlocked) .floating-modal,html:not(.busvisa-unlocked) .picker-backdrop{display:none!important}
+html:not(.busvisa-unlocked) body{overflow:auto;min-height:100dvh}
+.busvisa-unlocked #beta-gate{display:none!important}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.beta-gate{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse 70% 35% at 76% 17%,#d7e7ff 0%,#f6f9fe 78%,transparent 100%),linear-gradient(180deg,#f4f8ff 0%,#f8fbff 52%,#eaf1fc 100%);color:#142641;padding:calc(env(safe-area-inset-top,0px) + 22px) max(24px,calc((100vw - 510px)/2)) calc(env(safe-area-inset-bottom,0px) + 24px)}
+.beta-gate::before{content:'';position:absolute;z-index:-1;inset:auto -12% -22vh -12%;height:44vh;background:radial-gradient(ellipse at center,#bfd3f699 5%,#e0ebff22 62%,transparent 71%);pointer-events:none}
+.beta-gate__top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.beta-gate__label{font-size:10px;font-weight:850;color:#64809c;letter-spacing:2.4px}
+.beta-gate__lang select{width:180px;max-width:50vw;border:1px solid #dee8f5;border-radius:11px;background:#ffffffd9;color:#385775;padding:9px 12px;font-size:12px;outline:none;box-shadow:0 4px 14px #17375a0b}
+.beta-gate__content{width:100%;margin:auto 0;display:flex;flex-direction:column;padding:36px 0 30px}
+.beta-gate__brand{display:flex;align-items:center;gap:13px;margin-bottom:35px}
+.beta-gate__brand img{border-radius:25px;box-shadow:0 15px 35px #1b5ba239;object-fit:contain;width:82px;height:82px}
+.beta-gate__brand span{font-size:30px;font-weight:850;letter-spacing:-1.25px;color:#16345e}
+.beta-gate__chip{display:inline-flex;align-items:center;padding:7px 12px;border-radius:100px;color:#225fae;background:#e4effd;font-size:11px;font-weight:750;letter-spacing:.2px}
+.beta-gate__access h1{font-size:clamp(27px,7.7vw,36px);letter-spacing:-1px;line-height:1.23;margin:15px 0 13px;font-weight:850;max-width:420px}
+.beta-gate__access p{color:#798da6;font-size:14px;line-height:1.85;max-width:430px;margin:0 0 29px}
+.beta-form label{font-size:12px;font-weight:780;color:#4d6682;display:block;margin-bottom:10px}
+.beta-form__field{position:relative;display:flex;border-radius:17px;border:1.4px solid #d9e6f4;background:white;box-shadow:0 6px 18px #21425b0a;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.beta-form__field:focus-within{border-color:#4a84d9;box-shadow:0 0 0 3px #3c78ce1d}
+.beta-form__field input{height:60px;padding:0 15px;min-width:0;flex:1;border:0;outline:none;background:transparent;color:#152d4e;font-size:16px;letter-spacing:.5px}
+.beta-form__field input::placeholder{letter-spacing:0;color:#9bacbd}
+.beta-form__eye{background:transparent;border:0;color:#2f6fbe;font-size:13px;font-weight:700;padding:0 16px}
+.beta-form__error{min-height:22px;font-size:12px;color:#bf4444;margin:8px 0 10px;line-height:1.5}
+.beta-form__submit{display:flex;align-items:center;justify-content:center;gap:10px;height:55px;width:100%;border:0;border-radius:16px;background:linear-gradient(118deg,#2461b5,#337dd8);color:white;font-size:15px;font-weight:780;box-shadow:0 10px 22px #175aaf2e}
+.beta-form__submit>span{font-size:20px;line-height:1}
+.beta-form__submit:disabled{opacity:.65}
+.beta-gate__help{display:flex;align-items:flex-start;gap:10px;margin-top:25px;color:#879db3;font-size:11.5px;line-height:1.75}
+.beta-gate__help-icon{color:#4183cf;font-size:17px}
+.beta-gate__footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#91a6bb;font-size:10px;line-height:1.7;letter-spacing:.2px}
+@media(min-width:700px){.beta-gate{padding-left:calc((100vw - 460px)/2);padding-right:calc((100vw - 460px)/2)}}
+@media(max-height:720px){.beta-gate__content{padding-top:14px;padding-bottom:12px}.beta-gate__brand{margin-bottom:20px}.beta-gate__access p{margin-bottom:18px}.beta-gate__help{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.beta-gate__submit,.beta-form__field{transition:none}}
+
+
+/* BusVisa v0.3.1 — appearance controls and accessible dark palette. */
+.settings-appearance{border-top:0;padding-top:4px}
+.theme-mode-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.theme-mode-options button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:91px;border:1.5px solid #e0e9f4;background:#f7faff;color:#425a76;border-radius:14px;font-size:12px;font-weight:700;padding:10px 5px;position:relative}
+.theme-mode-options button[aria-checked="true"]{border-color:#3275d0;background:#eaf3ff;color:#175cba}
+.theme-mode-icon{font-size:25px;font-weight:500;line-height:1.1}
+.theme-mode-check{position:absolute;right:7px;top:4px;font-size:12px}
+.theme-mode-options button[aria-checked="true"] .theme-mode-check::after{content:'✓'}
+.settings-about-details{border-top:1px solid var(--line);margin-top:14px}
+.settings-about-details>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:60px;font-size:15px;font-weight:750;cursor:pointer;color:var(--ink)}
+.settings-about-details>summary::-webkit-details-marker{display:none}
+.settings-about-details>summary span{font-size:24px;color:var(--muted);transition:transform .2s}
+.settings-about-details[open]>summary span{transform:rotate(90deg)}
+.settings-about-content{padding:0 2px 8px}
+/* Apply to document root; JavaScript resolves system theme and monitors changes. */
+html[data-theme="dark"]{color-scheme:dark;--bg:#0e1828;--ink:#eaf1fa;--muted:#9aaec7;--navy:#0e2039;--accent:#8db8ff;--line:#2f4055;--grey:#657d98;--white:#1a293e;--green:#3db292;--gold:#e6ad53;--blue:#7baedc;--purple:#ad9be9;--pink:#df96af;background:#0e1828}
+html[data-theme="light"]{color-scheme:light}
+html[data-theme="dark"] body{background:#0e1828;color:var(--ink)}
+@media(min-width:720px){html[data-theme="dark"] body{background:linear-gradient(90deg,#07111e,#0e1828 50%,#07111e)}}
+html[data-theme="dark"] #app{background:var(--bg)}
+html[data-theme="dark"] :is(.passport-quick,.section-panel,.visa-card,.empty-state,.hint-card,.floating-modal,.country-sheet,.fee-entry,.search-row,.picker-row){background:#19283b;color:var(--ink);border-color:#304259;box-shadow:none}
+html[data-theme="dark"] :is(.about-entry,.about-hero strong,.about-block h3,.about-detail-row strong,.picker-row__names strong,.country-sheet__status strong,.detail-heading,.arrival-fee h3,.fee-entry__official,.map-card__top h2,.empty-state h3){color:var(--ink)}
+html[data-theme="dark"] :is(.about-block p,.about-detail-row>span,.country-sheet__body,.country-sheet__header p,.country-note,.fee-entry__small,.hint-card,.form-notice,.utility-panel p,.utility-panel small,.type-source-note,.type-fetch-note,.passport-panel__details label,.passport-panel__details small,.field>span){color:#abc0d7}
+html[data-theme="dark"] :is(.eyebrow,.panel-label,.map-eyebrow,.map-legend,.passport-quick__label,.summary-number small,.section-subtitle,.section-heading>span,.change-panel__head span,.about-entry__copy small,.about-muted,.picker-count,.picker-search-label,.search-row small,.picker-row__names small){color:#9cb2ca!important}
+html[data-theme="dark"] .bottom-nav{background:#111e30ee;border-top-color:#34455b;box-shadow:0 -8px 30px #0005}
+html[data-theme="dark"] .nav-tab{color:#9cafc8}
+html[data-theme="dark"] .nav-tab.active{color:#90bbff}
+html[data-theme="dark"] .summary-line{background:#37475a}
+html[data-theme="dark"] .map-card{background:linear-gradient(170deg,#1c354e,#14283c 70%,#172d43);border-color:#36506b;box-shadow:0 15px 40px #0003}
+html[data-theme="dark"] .map-card__live{background:#213c54b7;color:#b0d2ea}
+html[data-theme="dark"] .map-legend{border-top-color:#3a5369;color:#c6d3e2}
+html[data-theme="dark"] .land{stroke:#11283cba;fill:#60758b}
+html[data-theme="dark"] .land.status-required{fill:#60778e}
+html[data-theme="dark"] .land.status-unknown{fill:#516579}
+html[data-theme="dark"] .map-dot{stroke:#15263b}
+html[data-theme="dark"] .map-controls{background:#263a50ed;box-shadow:0 5px 20px #0005}
+html[data-theme="dark"] .map-controls button{color:#e7f1ff;border-color:#4d6074}
+html[data-theme="dark"] :is(.icon-btn,.close-btn,.secondary-btn,.fee-refresh){background:#263c55;color:#acd0ff;border-color:#45617d;box-shadow:none}
+html[data-theme="dark"] .about-entry__icon{background:#254465;color:#afd3ff}
+html[data-theme="dark"] :is(.passport-panel__details select,.floating-modal input[type=search],.field input,.field select,#picker-search,button.country-select,.country-note,.original-policy){background:#122238;color:#e6effa;border-color:#354e68}
+html[data-theme="dark"] input::placeholder{color:#8a9db3}
+html[data-theme="dark"] .search-row,.picker-row{border-bottom-color:#304358}
+html[data-theme="dark"] .picker-row:focus-visible,html[data-theme="dark"] .picker-row:hover{background:#294462}
+html[data-theme="dark"] .search-row .search-pill{background:#2a3e52;color:#adbed0}
+html[data-theme="dark"] .change-row{background:#122237;color:var(--ink);border-color:#30475d}
+html[data-theme="dark"] .arrival-fee{background:#13253a;border-color:#355069}
+html[data-theme="dark"] .fee-entry__currency{color:#acd5ff}
+html[data-theme="dark"] .fee-entry__cny{color:#76dbb8}
+html[data-theme="dark"] .original-policy p{color:#a9bfd6}
+html[data-theme="dark"] :is(.about-language-options,.about-language-options button){background:#17283d;color:#e8f1fb;border-color:#35495e}
+html[data-theme="dark"] .about-language-options button{border-bottom-color:#34485d}
+html[data-theme="dark"] .about-language-options button[aria-checked="true"]{background:#253f62;color:#a5caff}
+html[data-theme="dark"] .about-block{border-top-color:#30455a}
+html[data-theme="dark"] .about-detail-row{border-bottom-color:#30455a}
+html[data-theme="dark"] :is(.about-block a,.about-site-url,.country-sheet__body a,.fee-entry a){color:#90baff}
+html[data-theme="dark"] .about-saved{color:#81d9b1!important}
+html[data-theme="dark"] .theme-mode-options button{background:#14243a;color:#b8cbe1;border-color:#3b5169}
+html[data-theme="dark"] .theme-mode-options button[aria-checked="true"]{background:#284462;color:#bbd7ff;border-color:#7eaef5}
+html[data-theme="dark"] .settings-about-details{border-top-color:#30455a}
+html[data-theme="dark"] .beta-gate{background:radial-gradient(ellipse 75% 35% at 76% 15%,#1e3b60 0%,#0e1c30 80%,transparent 100%),linear-gradient(180deg,#101e32,#101b2d 54%,#0c192c);color:#eaf2fc}
+html[data-theme="dark"] .beta-gate::before{background:radial-gradient(ellipse at center,#27466b99 10%,#132c4a22 62%,transparent 74%)}
+html[data-theme="dark"] .beta-gate__brand span,html[data-theme="dark"] .beta-gate__access h1{color:#edf4ff}
+html[data-theme="dark"] .beta-gate__chip{color:#b2d1ff;background:#234263}
+html[data-theme="dark"] .beta-gate__access p,html[data-theme="dark"] .beta-gate__help,html[data-theme="dark"] .beta-gate__footer,html[data-theme="dark"] .beta-gate__label{color:#9fb4cc}
+html[data-theme="dark"] .beta-form label{color:#b8cbe1}
+html[data-theme="dark"] .beta-gate__lang select,html[data-theme="dark"] .beta-form__field{background:#182b42;color:#eaf3ff;border-color:#3c5570;box-shadow:none}
+html[data-theme="dark"] .beta-form__field input{color:#f0f6ff}
+html[data-theme="dark"] .beta-form__field input::placeholder{color:#879cb5}
+html[data-theme="dark"] .beta-form__eye{color:#a8ccff}
+html[data-theme="dark"] .beta-form__error{color:#ff9f9f}
+html[data-theme="dark"] .overlay,html[data-theme="dark"] .picker-backdrop{background:#010713bc}
+
+/* v0.3.2: readable terms and minor/guardian notices in Settings > About. */
+.legal-disclaimer{margin-top:12px;padding:2px 0 6px}
+.legal-disclaimer .about-block{padding-top:14px}
+.legal-disclaimer h3{margin-bottom:11px}
+.legal-disclaimer h4{font-size:13px;line-height:1.5;font-weight:800;color:var(--ink);margin:6px 0 8px}
+.legal-disclaimer p{line-height:1.8;overflow-wrap:anywhere;letter-spacing:.02px}
+.legal-disclaimer .legal-minors{padding:14px 12px;border:1px solid #d7e6f7;border-radius:12px;background:#f2f7ff;margin:14px 0}
+.legal-disclaimer .legal-minors h4{color:#21599a}
+html[data-theme="dark"] .legal-disclaimer .legal-minors{background:#192e4a;border-color:#3c5c80}
+html[data-theme="dark"] .legal-disclaimer .legal-minors h4{color:#b8d7ff}
