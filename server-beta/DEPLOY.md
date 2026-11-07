@@ -20,13 +20,14 @@
 
 ## 环境变量
 
-创建 Upstash Redis 数据库，取得 HTTPS REST URL 与可写 REST Token。在 Netlify 环境变量中配置以下三项，作用域包含 Functions，并为目标部署上下文提供值。
+创建 Upstash Redis 数据库，取得 HTTPS REST URL 与可写 REST Token。在 Netlify 环境变量中配置以下四项，作用域包含 Functions，并为目标部署上下文提供值。
 
 - `UPSTASH_REDIS_REST_URL`
 - `UPSTASH_REDIS_REST_TOKEN`
 - `INVITE_HASH_SECRET`
+- `INVITE_ADMIN_TOKEN`
 
-`INVITE_HASH_SECRET` 使用至少 32 字符的随机值，可用以下命令生成。
+`INVITE_HASH_SECRET` 与 `INVITE_ADMIN_TOKEN` 使用不同的随机值，且均至少 32 字符。管理员密钥仅配置在 Netlify 的 Functions 环境变量中，不要写入代码或普通说明文档。`INVITE_HASH_SECRET` 使用至少 32 字符的随机值，可用以下命令生成。
 
 ```sh
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -51,7 +52,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - 同一 IP 在 15 分钟内最多提交 10 次验证请求，超限后返回 429。
 - 检查地图、签证管理、四语言、主题、政策同步和汇率功能。
 
-在 `server-beta/` 中运行 `npm test` 可执行 12 项本地网关检查，数据库响应由测试模拟。另已进行前端语法检查、模拟 Redis 下的 Lua 计数检查、Netlify 函数打包及打包后页面读取检查。
+在 `server-beta/` 中运行 `npm test` 可执行 16 项本地网关与管理接口检查，数据库响应由测试模拟。管理后台位于已部署网站的 `/admin`，使用 `INVITE_ADMIN_TOKEN` 登录，可查看、新建和停用邀请码。另已进行前端语法检查、模拟 Redis 下的 Lua 计数检查、Netlify 函数打包及打包后页面读取检查。
 
 本次上线已完成服务端登录验证，维护者已确认地图与站内功能正常。旧设备缓存迁移、会话到期和停用后的线上访问及不同移动浏览器仍需持续验证。
 
