@@ -73,7 +73,6 @@
     noteInput.className = 'note-input';
     noteInput.maxLength = 200;
     noteInput.value = invite.note || '';
-    noteInput.placeholder = '记录发给谁了';
     noteInput.setAttribute('aria-label', `邀请码 ${invite.id.slice(0, 8)} 的备注`);
     const saveButton = document.createElement('button');
     saveButton.type = 'submit';
