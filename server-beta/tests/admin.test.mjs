@@ -1,6 +1,7 @@
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import gateway from '../netlify/functions/gateway.mjs';
+import { UPDATE_INVITE_NOTE } from '../netlify/lib/store.mjs';
 
 process.env.INVITE_HASH_SECRET = 'local-test-secret-32-characters-long';
 process.env.INVITE_ADMIN_TOKEN = 'local-admin-secret-32-characters-long';
@@ -119,6 +120,56 @@ test('permanent invitations have no database expiration and remain manageable', 
   assert.equal(disabled.status, 204);
 });
 
+test('admin can create an invitation with a recipient note', async () => {
+  let stored;
+  redisQueue(['OK'], args => { stored = JSON.parse(args[2]); });
+  const response = await gateway(request('/api/admin/invites', {
+    method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ maxUses: 1, validDays: 14, note: '  测试收件人  ' })
+  }));
+  assert.equal(response.status, 201);
+  assert.equal(stored.note, '测试收件人');
+  assert.equal((await response.json()).note, '测试收件人');
+});
+
+test('admin can update, clear, and list an invitation note', async () => {
+  const id = 'c'.repeat(64);
+  const calls = [];
+  const row = { maxUses: 3, uses: 2, expiresAt: 0, disabled: true, note: '测试收件人' };
+  redisQueue([1, ['0', [`busvisa:invite:${id}`]], [JSON.stringify(row)], 1, 0], args => calls.push(args));
+  const saveNote = note => gateway(request(`/api/admin/invites/${id}/note`, {
+    method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ note })
+  }));
+  assert.equal((await saveNote('  测试收件人  ')).status, 204);
+  assert.deepEqual(calls[0], ['EVAL', UPDATE_INVITE_NOTE, 1, `busvisa:invite:${id}`, '测试收件人']);
+  const list = await gateway(request('/api/admin/invites', { headers: auth }));
+  assert.deepEqual((await list.json()).invites[0], { id, ...row });
+  assert.equal((await saveNote('')).status, 204);
+  assert.equal(calls[3][4], '');
+  assert.equal((await saveNote('gone')).status, 404);
+});
+
+test('note updates require admin authorization and validate their input', async () => {
+  const route = `/api/admin/invites/${'d'.repeat(64)}/note`;
+  redisQueue([2], args => assert.equal(args[0], 'INCR'));
+  assert.equal((await gateway(request(route, {
+    method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: '{"note":"test"}'
+  }))).status, 401);
+  globalThis.fetch = () => { throw new Error('invalid requests must not access Redis'); };
+  for (const input of [null, [], {}, { note: 42 }, { note: 'x'.repeat(201) }]) {
+    const response = await gateway(request(route, {
+      method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(input)
+    }));
+    assert.equal(response.status, 400);
+  }
+  assert.equal((await gateway(request(route, {
+    method: 'POST', headers: { ...auth, Origin: 'https://other.test', 'Content-Type': 'application/json' }, body: '{"note":"test"}'
+  }))).status, 403);
+  assert.equal((await gateway(request(route, { method: 'POST', headers: { ...auth, Origin: origin }, body: '{}' }))).status, 415);
+  assert.equal((await gateway(request(route, { headers: { ...auth, Origin: origin } }))).status, 405);
+});
+
 test('admin API validates origins, cursors, content type, and invite limits', async () => {
   globalThis.fetch = () => { throw new Error('should not access Redis'); };
   const crossOrigin = request('/api/admin/invites', {
@@ -128,7 +179,7 @@ test('admin API validates origins, cursors, content type, and invite limits', as
   assert.equal((await gateway(crossOrigin)).status, 403);
   assert.equal((await gateway(request('/api/admin/invites?cursor=bad', { headers: auth }))).status, 400);
   assert.equal((await gateway(request('/api/admin/invites', { method: 'POST', headers: { ...auth, Origin: origin }, body: '{}' }))).status, 415);
-  for (const input of [null, [], { maxUses: 1, permanent: 'true' }, { maxUses: 1, permanent: false }, { maxUses: 0, permanent: true }, { maxUses: 0, validDays: 1 }, { maxUses: 1, validDays: 366 }, { maxUses: 1.5, validDays: 1 }]) {
+  for (const input of [null, [], { maxUses: 1, validDays: 1, note: 1 }, { maxUses: 1, validDays: 1, note: 'x'.repeat(201) }, { maxUses: 1, permanent: 'true' }, { maxUses: 1, permanent: false }, { maxUses: 0, permanent: true }, { maxUses: 0, validDays: 1 }, { maxUses: 1, validDays: 366 }, { maxUses: 1.5, validDays: 1 }]) {
     const response = await gateway(request('/api/admin/invites', {
       method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(input)
     }));

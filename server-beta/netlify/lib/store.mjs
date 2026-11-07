@@ -22,6 +22,16 @@ export async function command(...args) {
   return data.result;
 }
 
+// Update the note atomically so concurrent redemptions and revocations keep their fields.
+export const UPDATE_INVITE_NOTE = `
+local value = redis.call('GET', KEYS[1])
+if not value then return 0 end
+local invite = cjson.decode(value)
+invite.note = ARGV[1]
+redis.call('SET', KEYS[1], cjson.encode(invite), 'KEEPTTL')
+return 1
+`;
+
 // Redemption and session creation commit together. Repeating the same request
 // with its existing session cannot consume a second invitation use.
 export const REDEEM = `
