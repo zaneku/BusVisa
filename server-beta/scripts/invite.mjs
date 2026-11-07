@@ -13,7 +13,7 @@ if (action === 'create') {
   const code = `BV-${randomBytes(18).toString('base64url')}`;
   const id = digest(code);
   const expiresAt = permanent ? 0 : Math.floor(Date.now() / 1000) + validDays * 86400;
-  const row = { maxUses, uses: 0, expiresAt, disabled: false };
+  const row = { maxUses, uses: 0, expiresAt, disabled: false, createdAt: Date.now() };
   await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), ...(permanent ? [] : ['EXAT', expiresAt]), 'NX');
   console.log(JSON.stringify({ code, id, maxUses, expiresAt: permanent ? 'permanent' : new Date(expiresAt * 1000).toISOString() }, null, 2));
 } else if (['disable', 'status'].includes(action) && /^[a-f0-9]{64}$/.test(value || '')) {

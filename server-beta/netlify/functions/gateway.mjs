@@ -69,7 +69,7 @@ export default async function handler(request, context = {}) {
         const code = `BV-${randomBytes(18).toString('base64url')}`;
         const id = digest(code);
         const expiresAt = permanent ? 0 : now + validDays * 86400;
-        const row = { maxUses, uses: 0, expiresAt, disabled: false, note };
+        const row = { maxUses, uses: 0, expiresAt, disabled: false, note, createdAt: Date.now() };
         const saved = await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), ...(permanent ? [] : ['EXAT', expiresAt]), 'NX');
         if (saved !== 'OK') throw new Error('Unable to store invitation');
         return reply(JSON.stringify({ code, id, ...row }), 201, { 'Content-Type': types['.json'] });

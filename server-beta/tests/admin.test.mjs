@@ -77,6 +77,9 @@ test('admin can create invite, list pages, and disable an invite', async () => {
   assert.match(created.code, /^BV-[A-Za-z0-9_-]{24}$/);
   assert.equal(created.maxUses, 3);
   assert.equal(created.uses, 0);
+  assert.ok(Number.isSafeInteger(created.createdAt));
+  assert.ok(Math.abs(created.createdAt - Date.now()) < 5000);
+  assert.equal(JSON.parse(calls[0][2]).createdAt, created.createdAt);
   assert.equal(calls[0][0], 'SET');
   assert.match(calls[0][1], /^busvisa:invite:[a-f0-9]{64}$/);
   assert.doesNotMatch(JSON.stringify(calls[0]), new RegExp(created.code));
