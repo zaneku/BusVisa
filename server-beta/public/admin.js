@@ -65,7 +65,52 @@
     } else {
       actionCell.textContent = '—';
     }
-    row.append(id, usage, expiry, statusCell, actionCell);
+    const noteCell = document.createElement('td');
+    const noteForm = document.createElement('form');
+    noteForm.className = 'note-editor';
+    const noteInput = document.createElement('input');
+    noteInput.type = 'text';
+    noteInput.className = 'note-input';
+    noteInput.maxLength = 200;
+    noteInput.value = invite.note || '';
+    noteInput.placeholder = '记录发给谁了';
+    noteInput.setAttribute('aria-label', `邀请码 ${invite.id.slice(0, 8)} 的备注`);
+    const saveButton = document.createElement('button');
+    saveButton.type = 'submit';
+    saveButton.className = 'quiet-button note-save';
+    saveButton.textContent = '保存';
+    saveButton.setAttribute('aria-live', 'polite');
+    noteInput.addEventListener('input', () => { saveButton.textContent = '保存'; });
+    noteForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const note = noteInput.value.trim();
+      if (note.length > 200) {
+        showError('备注最多 200 个字符。');
+        return;
+      }
+      noteInput.disabled = true;
+      saveButton.disabled = true;
+      saveButton.textContent = '保存中…';
+      showError('');
+      try {
+        await api(`/api/admin/invites/${invite.id}/note`, {
+          method: 'POST',
+          body: JSON.stringify({ note })
+        });
+        invite.note = note;
+        noteInput.value = note;
+        saveButton.textContent = '已保存';
+      } catch (error) {
+        showError(error.message);
+        saveButton.textContent = '重试';
+      } finally {
+        noteInput.disabled = false;
+        saveButton.disabled = false;
+      }
+    });
+    noteForm.append(noteInput, saveButton);
+    noteCell.append(noteForm);
+    row.append(id, noteCell, usage, expiry, statusCell, actionCell);
     return row;
   }
 
@@ -182,7 +227,7 @@
     try {
       const created = await api('/api/admin/invites', {
         method: 'POST',
-        body: JSON.stringify({ maxUses, ...(permanent ? { permanent: true } : { validDays }) })
+        body: JSON.stringify({ maxUses, ...(permanent ? { permanent: true } : { validDays }), note: $('invite-note').value.trim() })
       });
       $('created-code').textContent = created.code;
       $('created-meta').textContent = `${created.expiresAt === 0 ? '永久有效' : `有效至 ${time(created.expiresAt)}`} · 激活上限 ${created.maxUses} 次`;

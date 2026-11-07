@@ -1,7 +1,7 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { command, digest, REDEEM, CHECK_SESSION } from '../lib/store.mjs';
+import { command, digest, REDEEM, CHECK_SESSION, UPDATE_INVITE_NOTE } from '../lib/store.mjs';
 
 const COOKIE = '__Host-busvisa_session';
 const types = {
@@ -33,7 +33,7 @@ export default async function handler(request, context = {}) {
     const now = Math.floor(Date.now() / 1000);
     const token = sessionToken(request);
 
-    if (pathname === '/api/admin/invites' || /^\/api\/admin\/invites\/[a-f0-9]{64}\/disable$/.test(pathname)) {
+    if (pathname === '/api/admin/invites' || /^\/api\/admin\/invites\/[a-f0-9]{64}\/(disable|note)$/.test(pathname)) {
       const auth = await authorizeAdmin(request, context);
       if (auth !== 200) return reply('', auth, auth === 429 ? { 'Retry-After': '900' } : {});
 
@@ -59,6 +59,8 @@ export default async function handler(request, context = {}) {
         try { input = JSON.parse(body); } catch { return reply('', 400); }
         if (!input || typeof input !== 'object' || Array.isArray(input) ||
             (input.permanent !== undefined && typeof input.permanent !== 'boolean')) return reply('', 400);
+        if (input.note !== undefined && (typeof input.note !== 'string' || input.note.length > 200)) return reply('', 400);
+        const note = (input.note || '').trim();
         const permanent = input.permanent === true;
         const maxUses = Number(input.maxUses);
         const validDays = Number(input.validDays);
@@ -67,10 +69,22 @@ export default async function handler(request, context = {}) {
         const code = `BV-${randomBytes(18).toString('base64url')}`;
         const id = digest(code);
         const expiresAt = permanent ? 0 : now + validDays * 86400;
-        const row = { maxUses, uses: 0, expiresAt, disabled: false };
+        const row = { maxUses, uses: 0, expiresAt, disabled: false, note };
         const saved = await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), ...(permanent ? [] : ['EXAT', expiresAt]), 'NX');
         if (saved !== 'OK') throw new Error('Unable to store invitation');
         return reply(JSON.stringify({ code, id, ...row }), 201, { 'Content-Type': types['.json'] });
+      }
+
+      const noteMatch = pathname.match(/^\/api\/admin\/invites\/([a-f0-9]{64})\/note$/);
+      if (noteMatch && request.method === 'POST') {
+        if (!request.headers.get('content-type')?.startsWith('application/json')) return reply('', 415);
+        const body = await request.text();
+        if (body.length > 1024) return reply('', 413);
+        let input;
+        try { input = JSON.parse(body); } catch { return reply('', 400); }
+        if (!input || typeof input.note !== 'string' || input.note.length > 200) return reply('', 400);
+        const updated = await command('EVAL', UPDATE_INVITE_NOTE, 1, `busvisa:invite:${noteMatch[1]}`, input.note.trim());
+        return updated ? reply(null, 204) : reply('', 404);
       }
 
       const disableMatch = pathname.match(/^\/api\/admin\/invites\/([a-f0-9]{64})\/disable$/);
