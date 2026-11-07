@@ -7,7 +7,7 @@
 
 # BusVisa — Global Visa Map
 
-**Version:** v0.3.0 · **Author:** Ku · **Website:** https://visaatlas.netlify.app/ · **GitHub:** https://github.com/zaneku/BusVisa
+**Version:** v0.3.0 · **Author:** Ku · **Website:** https://busvisa.netlify.app/ · **GitHub:** https://github.com/zaneku/BusVisa
 
 An independent, mobile-first global visa access map. Current prototype is a static Progressive Web App (PWA), designed for iOS Safari and Android browsers, with optional later integration into a native wrapper.
 
