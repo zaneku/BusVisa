@@ -6,7 +6,7 @@
   const loginPanel = $('login-panel');
   const workspace = $('workspace');
   const rowHost = $('invite-rows');
-  const time = (value) => new Date(value * 1000).toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' });
+  const time = (value) => value === 0 ? '永久有效' : new Date(value * 1000).toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' });
 
   function showError(message) {
     const error = $('global-error');
@@ -33,7 +33,7 @@
 
   function statusOf(invite) {
     if (invite.disabled) return ['已停用', 'disabled'];
-    if (invite.expiresAt <= Date.now() / 1000) return ['已过期', 'expired'];
+    if (invite.expiresAt !== 0 && invite.expiresAt <= Date.now() / 1000) return ['已过期', 'expired'];
     if (invite.uses >= invite.maxUses) return ['已用完', 'used'];
     return ['有效', 'active'];
   }
@@ -55,7 +55,7 @@
     statusCell.append(status);
     const actionCell = document.createElement('td');
     actionCell.className = 'table-actions';
-    if (!invite.disabled && invite.expiresAt > Date.now() / 1000 && invite.uses < invite.maxUses) {
+    if (!invite.disabled && (invite.expiresAt === 0 || invite.expiresAt > Date.now() / 1000)) {
       const button = document.createElement('button');
       button.className = 'danger-button';
       button.type = 'button';
@@ -162,12 +162,18 @@
     }
   });
 
+  $('permanent').addEventListener('change', () => {
+    $('valid-days').disabled = $('permanent').checked;
+    $('valid-days').required = !$('permanent').checked;
+  });
+
   $('create-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     const maxUses = Number($('max-uses').value);
     const validDays = Number($('valid-days').value);
+    const permanent = $('permanent').checked;
     if (!Number.isSafeInteger(maxUses) || maxUses < 1 || maxUses > 10000 ||
-        !Number.isSafeInteger(validDays) || validDays < 1 || validDays > 365) {
+        (!permanent && (!Number.isSafeInteger(validDays) || validDays < 1 || validDays > 365))) {
       showError('激活次数需为 1–10000，有效天数需为 1–365。');
       return;
     }
@@ -176,10 +182,10 @@
     try {
       const created = await api('/api/admin/invites', {
         method: 'POST',
-        body: JSON.stringify({ maxUses, validDays })
+        body: JSON.stringify({ maxUses, ...(permanent ? { permanent: true } : { validDays }) })
       });
       $('created-code').textContent = created.code;
-      $('created-meta').textContent = `有效至 ${time(created.expiresAt)} · 激活上限 ${created.maxUses} 次`;
+      $('created-meta').textContent = `${created.expiresAt === 0 ? '永久有效' : `有效至 ${time(created.expiresAt)}`} · 激活上限 ${created.maxUses} 次`;
       $('created-result').hidden = false;
       await loadInvites(true);
     } catch (error) {
@@ -203,4 +209,3 @@
   $('load-more').addEventListener('click', () => loadInvites(false));
   $('logout-button').addEventListener('click', logout);
 })();
-

@@ -32,7 +32,7 @@ local invite = redis.call('GET', KEYS[2])
 if not invite then return {401} end
 local row = cjson.decode(invite)
 local now = tonumber(ARGV[1])
-if row.disabled or row.expiresAt <= now then return {401} end
+if row.disabled or (row.expiresAt ~= 0 and row.expiresAt <= now) then return {401} end
 local existing = redis.call('GET', KEYS[3])
 if existing then
   local session = cjson.decode(existing)
@@ -40,8 +40,9 @@ if existing then
 end
 if row.uses >= row.maxUses then return {401} end
 row.uses = row.uses + 1
-local ttl = math.min(604800, row.expiresAt - now)
-redis.call('SET', KEYS[2], cjson.encode(row))
+local ttl = 604800
+if row.expiresAt ~= 0 then ttl = math.min(ttl, row.expiresAt - now) end
+redis.call('SET', KEYS[2], cjson.encode(row), 'KEEPTTL')
 redis.call('SET', KEYS[3], cjson.encode({inviteKey=KEYS[2]}), 'EX', ttl)
 return {200}
 `;
@@ -53,6 +54,6 @@ local session = cjson.decode(value)
 local value = redis.call('GET', session.inviteKey)
 if not value then return 0 end
 local invite = cjson.decode(value)
-if invite.disabled or invite.expiresAt <= tonumber(ARGV[1]) then return 0 end
+if invite.disabled or (invite.expiresAt ~= 0 and invite.expiresAt <= tonumber(ARGV[1])) then return 0 end
 return 1
 `;
