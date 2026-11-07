@@ -1,106 +1,177 @@
-## BusVisa v0.3.2 — 设置与外观
-
-- 签证页最下方的「设置」包含浅色、深色、跟随系统、四语言和可展开的「关于 BusVisa」。
-- 外观默认跟随系统，保存在本机 `busvisa.theme.v1`；切换不会清除护照、签证或邀请码解锁状态。
-- 用户界面已移除开发用「检查本站政策接口是否可用」入口；正式同步按钮与后台数据接口保留。
-- Netlify 更新时把 `index.html`、`theme.js`、`style.css`、`app.js`、`sw.js` 等同层文件一起部署。
-
 # BusVisa — Global Visa Map
 
-**Version:** v0.3.0 · **Author:** Ku · **Website:** https://busvisa.netlify.app/ · **GitHub:** https://github.com/zaneku/BusVisa
+**v0.3.2 · 邀请制内测 · 作者 Ku**
 
-An independent, mobile-first global visa access map. Current prototype is a static Progressive Web App (PWA), designed for iOS Safari and Android browsers, with optional later integration into a native wrapper.
+BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已登记的签证类型，展示目的地入境方式、条件性便利和参考费用，支持简体中文、繁體中文（香港）、繁體中文（台灣）及 English。
 
-## 邀请制内测 / Private beta
+当前网站采用 Netlify Functions 和 Upstash Redis 验证邀请码、管理会话。部署入口位于 `server-beta/`。
 
-- 首页增加四语言邀请码验证界面：**简体中文、繁體中文（香港）、繁體中文（台灣）、English**。
-- 输入邀请码后解锁应用，验证结果只保存在该设备 / 浏览器的 `localStorage`。未解锁前不初始化地图和在线政策同步。
-- 验证不修改已有 `va.v2.visas`、`va.passport` 等用户记录。
-- **安全说明：本实现是客户端内测入口，并非真正的服务器端访问控制。** 
+[访问网站](https://busvisa.netlify.app/) · [GitHub 仓库](https://github.com/zaneku/BusVisa)
 
 ## 主要功能 / Features
 
-- 底部仅有 **地图 / 签证**（Map / Visas）两栏
-- 根据所选护照、已登记的签证类型，提示目的地免签、落地签、电子旅行授权或条件性通行资格
-- 护照与签证签发国支持简体中文、繁体中文（香港及台湾）和英文混合搜索
-- 签证类型按签发国家分别列出；申根成员国包含申根 A / C / D 等类别；未收录时可手动录入
-- 不要求或存储签证有效期
-- 语言：简体中文、繁體中文（香港）、繁體中文（台灣）、English；设置位于 **签证 → 关于**
-- 在 **签证 → 关于 BusVisa** 显示作者 Ku 和可点击的 [GitHub 项目链接](https://github.com/zaneku/BusVisa)
-- 落地签费用、当地币及人民币参考价（来源有更新周期，不等于银行实时结算）
-- 在线同步公开入境政策数据并保留本地缓存；显示数据来源及最近同步记录
-- 主屏幕图标、离线壳缓存、PWA manifest
+- **地图与签证**。底部提供地图和签证两栏，根据护照及已登记签证展示目的地入境方式。
+- **多语言搜索**。护照、签证签发国家及目的地支持中英文搜索。
+- **签证记录**。按签发国家列出签证类型，支持手动录入。个人护照选择、签证记录和外观偏好保存在浏览器本地。
+- **政策与费用**。支持在线政策同步、来源查看、落地签费用及当地币和人民币参考换算。
+- **设置与外观**。在签证页底部的设置中切换语言及浅色、深色、跟随系统模式，并查看关于与使用说明。
+- **移动端入口**。提供主屏幕图标和 Web App manifest，适配移动浏览器使用。
 
-## 部署到 Netlify / Deployment
+## 邀请制内测 / Private beta
 
-本仓库是 **静态网站**：`index.html`、`app.js`、`style.css`、`i18n.js`、`data/` 和 `icons/` 均位于仓库根目录。无需 npm 编译。
+邀请码由服务端验证。登录成功后，通过 `HttpOnly`、`Secure`、`SameSite=Strict` Cookie 保存会话，服务端在读取受限资源时检查会话及关联邀请码。
 
-在 Netlify 中连接此 GitHub 仓库并创建部署配置：
+| 项目 | 当前规则 |
+| --- | --- |
+| 邀请码 | 可设置激活次数和有效期，支持查询及停用 |
+| 登录会话 | 最长 7 天，同时受邀请码到期和停用状态约束 |
+| 激活次数 | 每个新浏览器会话激活消耗一次名额 |
+| 尝试限制 | 同一来源 IP 在 15 分钟内最多提交 10 次验证请求 |
+| 访问检查 | 应用页面、应用脚本、本地政策数据和同源政策及汇率代理均经过会话检查 |
 
-- **Base directory**: 留空 / empty
-- **Build command**: 留空 / empty
-- **Publish directory**: `.`
+清除 Cookie、更换浏览器或会话到期后，需要仍有剩余次数的邀请码重新激活。停用邀请码后，关联会话的后续受限资源请求将被拒绝。
 
-保留仓库中的 `_redirects` 和 `_headers`：它们为政策数据和参考汇率提供 Netlify 同域代理及缓存控制。发布成功后，可在 Safari 中通过“添加到主屏幕”将网站保存为 Web App。
+新版已移除应用离线资源缓存，并提供旧服务工作线程的清理与注销逻辑。旧浏览器登录标记由新版邀请码页清理，服务端使用会话验证访问资格。
 
-**如已手动部署了 `busvisa.netlify.app`：** 请在原有 Netlify 站点中链接 GitHub 仓库，而不是创建第二个同名站点。连接仓库并设置发布目录为项目根目录后，今后 push 即可触发构建（受 Netlify 设置影响）。
+## GitHub 与自动部署 / Deployment
 
-## 使用和限制 / Important limitations
+在现有 Netlify 项目中关联 `zaneku/BusVisa`，生产分支设为 `main`。通过 PR 将更新合入 `main` 后，Netlify 按项目设置自动构建并部署。发布结果以 Netlify 的部署状态为准。
 
-- 这只是签证政策 **参考工具**，并非领事机构或移民部门的官方入境许可系统。
-- 公开数据来源的更新频率与不同国家的移民政策发布速度不一致；在出发、购票和办理登机手续前，请核对相应政府及承运航司的最新要求。
-- 已登记的签证类型只是个人记录，不代表满足有效期、多次入境、首次使用、签证签发地等附加要求；对于第三国签证免签政策，App 仅能提供条件性提示。
-- 签证记录保存在你的浏览器本地存储中，本仓库**不包含**你的个人签证信息。清理网站数据或更换域名会导致记录无法自动同步。
-- `busvisa.netlify.app` 的内容是否更新，由 Netlify 部署状态决定；将文件提交到 GitHub 本身不会自动修改 Netlify 上线版本。
+| 构建设置 | 值 |
+| --- | --- |
+| Branch to deploy | `main` |
+| Base directory | `server-beta` |
+| Build command | 留空 |
+| Publish directory | `public` |
+| Functions directory | `netlify/functions` |
 
-## 数据来源 / Credits
+发布目录和函数目录以 Base directory 为基础。若界面自动显示 `server-beta/` 前缀，在前缀后分别填写 `public` 和 `netlify/functions`。
 
-- **TravelRequirements.info — Entry Requirements Dataset**, AXG Sp. z o.o. — [dataset](https://github.com/travel-requirements/entry-requirements), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The app uses this dataset and provides per-rule references where available.
-- **Frankfurter** — daily indicative foreign-exchange rates: https://frankfurter.dev/ . These are not transaction rates.
-- **Natural Earth** — public-domain world boundaries: https://www.naturalearthdata.com/ .
-- **Passport Index Data (imorte)** — alternative publicly accessible passport data, MIT License: https://github.com/imorte/passport-index-data .
-- `ysu-client` was referenced for general product architecture (Web + Capacitor); no source code copied from that GPL-3.0 repository.
+`server-beta/netlify.toml` 配置了函数打包、受限资源路由及缓存响应头。需要通过 Netlify 的 Git 构建或支持函数构建的 CLI 流程部署。
 
-See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the notices. Project-specific code has not been released under an open-source license; publishing this repository publicly does not by itself grant a license to reuse the code.
+### 环境变量
+
+在 Netlify 中配置以下变量，作用域须包含 Functions，生产站点的值填写在 Production 上下文中。需要测试部署预览时，也为 Deploy Previews 配置相应值。
+
+| 变量 | 用途 |
+| --- | --- |
+| `UPSTASH_REDIS_REST_URL` | Upstash 数据库的 HTTPS REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | 对应数据库的可写 REST Token |
+| `INVITE_HASH_SECRET` | 至少 32 字符的随机密钥，用于邀请码、会话和限流键的摘要 |
+
+变量值只填写值本身，去掉首尾引号和空白。更新 Netlify 环境变量后重新部署，使函数使用新配置。
+
+## 邀请码管理 / Invitation management
+
+本机需要 Node.js 22 或更高版本。在 `server-beta/` 下创建 `.env`，使用与目标 Netlify 部署相同的一组配置。下面仅为占位示例。
+
+```dotenv
+UPSTASH_REDIS_REST_URL=https://YOUR-DATABASE.upstash.io
+UPSTASH_REDIS_REST_TOKEN=YOUR-SERVER-ONLY-TOKEN
+INVITE_HASH_SECRET=REPLACE_WITH_AT_LEAST_32_RANDOM_CHARACTERS
+```
+
+在 `server-beta/` 目录中运行以下命令，生成有效 14 天、允许激活 1 次的邀请码。
+
+```sh
+npm run invite -- create 1 14
+```
+
+`create` 后的两个数字依次为最大激活次数和有效天数。输出中的 `code` 私下发给受邀用户，`id` 留作后续管理。
+
+```sh
+# 查询激活次数、有效期和停用状态
+npm run invite -- status <id>
+
+# 停用邀请码及其关联会话的后续访问
+npm run invite -- disable <id>
+```
+
+生成随机密钥可使用以下命令。保存后，将同一密钥填写到本机 `.env` 和对应 Netlify 部署的环境变量中。
+
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### 敏感配置
+
+数据库 Token、`INVITE_HASH_SECRET`、真实邀请码和本机 `.env` 应保密。数据库连接配置保存在 Netlify 环境变量和本机配置中。
+
+根目录 `.gitignore` 已覆盖 `.env`、`.env.*`、依赖目录、Netlify 本地状态和日志，并允许提交仅含占位内容的 `.env.example`。通过 GitHub 网页手动上传时，仍需自行检查所选文件。
 
 ## 项目目录 / Structure
 
 ```text
-index.html / app.js / style.css / i18n.js  # app UI
-policy-engine.js / fee-engine.js          # policy, fees and exchange logic
-country-search.js                         # multilingual country search
-sw.js / manifest.webmanifest              # PWA support
-data/                                      # static baseline reference data
-icons/                                     # favicon and PWA icon files
-_redirects / _headers                     # Netlify configuration
+.gitignore
+README.md
+THIRD_PARTY_NOTICES.md
+server-beta/
+├── netlify.toml                  # Netlify 构建和路由配置
+├── package.json                  # 测试与邀请码管理命令
+├── DEPLOY.md                     # 部署与验收说明
+├── public/                       # 公开的邀请码页、样式与图标
+├── private/                      # 经网关验证后返回的应用与数据
+│   ├── index.html
+│   ├── app.js
+│   ├── policy-engine.js
+│   ├── fee-engine.js
+│   ├── i18n.js
+│   ├── data/
+│   └── icons/
+├── netlify/
+│   ├── functions/gateway.mjs     # 邀请码验证、会话检查和资源访问
+│   └── lib/store.mjs             # Redis 请求及原子计数脚本
+├── scripts/invite.mjs            # 邀请码生成、查询和停用
+└── tests/gateway.test.mjs        # 网关回归检查
 ```
 
-**Current package:** 2026-11, v0.3.0.
+仓库根目录保留早期版本的 `index.html` 和 `app.js`。当前 Netlify 部署以 `server-beta/` 为入口。`private/` 表示站点运行时由网关控制访问的目录，公开仓库中的文件仍可通过 GitHub 查看。
 
-## v0.3.0 changes / 更新记录
+## 验证 / Verification
 
-- Current project name: **BusVisa** (GitHub: https://github.com/zaneku/BusVisa; current Netlify hostname unchanged).
-- Correct online `embassy-visa` status to `需提前签证` / Visa required; `unknown` reserved for missing or unsupported records.
-- Remove duplicates between built-in visa codes and online country-specific visa names, across all issuers.
-- Remove green internal visa-type update counter from the user interface.
-- Preserve existing local visa and language records: localStorage keys intentionally remain `va.*`.
+在 `server-beta/` 目录中运行本地网关检查。
 
-Do not clear Safari site data when upgrading. App metadata and new shortcut installs show **BusVisa**; existing iOS shortcuts may retain their old manually chosen label until renamed or re-added.
+```sh
+npm test
+```
 
-## v0.3.0 changes / 更新记录
+当前包含 12 项自动检查，覆盖邀请码页面、旧登录标记、受限资源、会话检查、重复请求、限流响应、数据库故障及路径限制，数据库响应由测试模拟。
 
-- Fix the country picker showing only the first **90** entries, ending at Guam. All **250** passport/issuer country and territory choices now render and scroll.
-- The map's destination search list no longer hides entries beyond its first 100 results.
-- Improve iPhone Safari vertical scrolling by separating a fixed search area from a single, touch-scrollable list.
-- Reset scroll position after changing search terms; preserve multilingual search and all saved visa records.
-- Bump static asset and service-worker cache versions to prevent stale list logic after Netlify deploy.
+本次上线已完成真实邀请码生成及登录，维护者已确认地图和站内功能正常。本地验证还包含函数打包、打包后页面读取以及在模拟 Redis 下执行 Lua 名额计数脚本。旧设备缓存迁移、长时间运行和不同移动浏览器仍需持续验证。
 
-## Disclaimer and minors
+## 数据来源 / Credits
 
-In **Visas → Settings → About BusVisa**, the app presents four localized notices covering:
-- Independent third-party information, no official government affiliation or guarantee of admission.
-- Travel, visa and monetary risks and liability limitations to the extent permitted by law.
-- Parental/guardian consent, oversight and document verification for minors.
-- Preservation of statutory rights and all liabilities that cannot legally be excluded.
+- **TravelRequirements.info — Entry Requirements Dataset**，AXG Sp. z o.o.，政策同步与规则来源参考。来源及授权信息见 [数据仓库](https://github.com/travel-requirements/entry-requirements) 和 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。
+- **Frankfurter**，提供定期更新的参考汇率。[服务网站](https://frankfurter.dev/)
+- **Natural Earth**，提供世界地图轮廓。[项目网站](https://www.naturalearthdata.com/)
+- **Passport Index Data（imorte）**，护照数据参考。[项目仓库](https://github.com/imorte/passport-index-data)
 
-No disclaimer guarantees absolute immunity; the actual effect depends on applicable law.
+第三方归属与授权信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。原型阶段曾参考 `ysu-client` 的 Web 与 Capacitor 架构思路。项目专属代码的授权声明见 [LICENSE](server-beta/private/LICENSE)。
+
+## 使用说明 / Usage notes
+
+- BusVisa 提供第三方入境政策参考。出发、购票和办理登机手续前，请核对目的地政府与承运航司的最新要求。
+- 护照和已登记签证用于生成条件性提示。实际入境资格还涉及有效期、入境次数、签证签发地、首次使用及其他附加条件。
+- 参考费用与汇率存在更新周期，实际办理或结算金额以服务提供方为准。
+- 护照选择和个人签证记录保存在浏览器本地。清理网站数据或更换域名、浏览器后，需要自行重新录入。
+- 签证页的设置与关于中提供四语言使用说明及未成年人和监护人提示。
+
+## 更新记录 / Changelog
+
+### v0.3.2 服务端邀请码升级
+
+- 接入 Netlify Functions 与 Upstash Redis，支持邀请码有效期、激活次数、停用和服务端会话检查。
+- 对受限页面、应用数据和同源代理进行访问验证，加入邀请码尝试限流。
+- 移除应用离线资源缓存，提供旧服务工作线程迁移逻辑。
+- 配置 GitHub `main` 自动部署工作流，补充本机敏感配置忽略规则。
+
+### v0.3.2 设置与外观
+
+- 在签证页设置中整合浅色、深色、跟随系统、四语言和关于信息。
+- 补充四语言使用说明及未成年人提示。
+
+### v0.3.0 地图与搜索
+
+- 修复护照及签发地列表截断、目的地搜索数量限制和移动端滚动问题。
+- 调整入境方式显示、签证类型去重及多语言搜索，沿用 `va.*` 本地记录。
+
