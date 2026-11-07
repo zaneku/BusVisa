@@ -1,0 +1,9 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies, deployment state, and logs
+node_modules/
+.netlify/
+*.log
