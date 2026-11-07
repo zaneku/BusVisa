@@ -96,6 +96,29 @@ test('admin can create invite, list pages, and disable an invite', async () => {
   assert.equal(calls.length, 6);
 });
 
+test('permanent invitations have no database expiration and remain manageable', async () => {
+  const calls = [];
+  redisQueue(['OK'], args => calls.push(args));
+  const response = await gateway(request('/api/admin/invites', {
+    method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ maxUses: 2, permanent: true })
+  }));
+  assert.equal(response.status, 201);
+  const created = await response.json();
+  assert.equal(created.expiresAt, 0);
+  assert.equal(created.maxUses, 2);
+  assert.equal(JSON.parse(calls[0][2]).expiresAt, 0);
+  assert.deepEqual(calls[0].slice(3), ['NX']);
+
+  redisQueue([['0', [`busvisa:invite:${created.id}`]], [JSON.stringify(created)], 1]);
+  const listed = await gateway(request('/api/admin/invites', { headers: auth }));
+  assert.equal((await listed.json()).invites[0].expiresAt, 0);
+  const disabled = await gateway(request(`/api/admin/invites/${created.id}/disable`, {
+    method: 'POST', headers: { ...auth, Origin: origin }
+  }));
+  assert.equal(disabled.status, 204);
+});
+
 test('admin API validates origins, cursors, content type, and invite limits', async () => {
   globalThis.fetch = () => { throw new Error('should not access Redis'); };
   const crossOrigin = request('/api/admin/invites', {
@@ -105,11 +128,10 @@ test('admin API validates origins, cursors, content type, and invite limits', as
   assert.equal((await gateway(crossOrigin)).status, 403);
   assert.equal((await gateway(request('/api/admin/invites?cursor=bad', { headers: auth }))).status, 400);
   assert.equal((await gateway(request('/api/admin/invites', { method: 'POST', headers: { ...auth, Origin: origin }, body: '{}' }))).status, 415);
-  for (const input of [{ maxUses: 0, validDays: 1 }, { maxUses: 1, validDays: 366 }, { maxUses: 1.5, validDays: 1 }]) {
+  for (const input of [null, [], { maxUses: 1, permanent: 'true' }, { maxUses: 1, permanent: false }, { maxUses: 0, permanent: true }, { maxUses: 0, validDays: 1 }, { maxUses: 1, validDays: 366 }, { maxUses: 1.5, validDays: 1 }]) {
     const response = await gateway(request('/api/admin/invites', {
       method: 'POST', headers: { ...auth, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(input)
     }));
     assert.equal(response.status, 400);
   }
 });
-

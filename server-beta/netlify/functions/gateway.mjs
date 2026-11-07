@@ -57,15 +57,18 @@ export default async function handler(request, context = {}) {
         if (body.length > 1024) return reply('', 413);
         let input;
         try { input = JSON.parse(body); } catch { return reply('', 400); }
+        if (!input || typeof input !== 'object' || Array.isArray(input) ||
+            (input.permanent !== undefined && typeof input.permanent !== 'boolean')) return reply('', 400);
+        const permanent = input.permanent === true;
         const maxUses = Number(input.maxUses);
         const validDays = Number(input.validDays);
         if (!Number.isSafeInteger(maxUses) || maxUses < 1 || maxUses > 10000 ||
-            !Number.isSafeInteger(validDays) || validDays < 1 || validDays > 365) return reply('', 400);
+            (!permanent && (!Number.isSafeInteger(validDays) || validDays < 1 || validDays > 365))) return reply('', 400);
         const code = `BV-${randomBytes(18).toString('base64url')}`;
         const id = digest(code);
-        const expiresAt = now + validDays * 86400;
+        const expiresAt = permanent ? 0 : now + validDays * 86400;
         const row = { maxUses, uses: 0, expiresAt, disabled: false };
-        const saved = await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), 'EXAT', expiresAt, 'NX');
+        const saved = await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), ...(permanent ? [] : ['EXAT', expiresAt]), 'NX');
         if (saved !== 'OK') throw new Error('Unable to store invitation');
         return reply(JSON.stringify({ code, id, ...row }), 201, { 'Content-Type': types['.json'] });
       }
@@ -176,4 +179,3 @@ function proxyUrl(pathname) {
   }
   return null;
 }
-
