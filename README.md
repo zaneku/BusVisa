@@ -43,7 +43,7 @@ An independent, mobile-first global visa access map. Current prototype is a stat
 
 保留仓库中的 `_redirects` 和 `_headers`：它们为政策数据和参考汇率提供 Netlify 同域代理及缓存控制。发布成功后，可在 Safari 中通过“添加到主屏幕”将网站保存为 Web App。
 
-**如已手动部署了 `visaatlas.netlify.app`：** 请在原有 Netlify 站点中链接 GitHub 仓库，而不是创建第二个同名站点。连接仓库并设置发布目录为项目根目录后，今后 push 即可触发构建（受 Netlify 设置影响）。
+**如已手动部署了 `busvisa.netlify.app`：** 请在原有 Netlify 站点中链接 GitHub 仓库，而不是创建第二个同名站点。连接仓库并设置发布目录为项目根目录后，今后 push 即可触发构建（受 Netlify 设置影响）。
 
 ## 使用和限制 / Important limitations
 
@@ -51,7 +51,7 @@ An independent, mobile-first global visa access map. Current prototype is a stat
 - 公开数据来源的更新频率与不同国家的移民政策发布速度不一致；在出发、购票和办理登机手续前，请核对相应政府及承运航司的最新要求。
 - 已登记的签证类型只是个人记录，不代表满足有效期、多次入境、首次使用、签证签发地等附加要求；对于第三国签证免签政策，App 仅能提供条件性提示。
 - 签证记录保存在你的浏览器本地存储中，本仓库**不包含**你的个人签证信息。清理网站数据或更换域名会导致记录无法自动同步。
-- `visaatlas.netlify.app` 的内容是否更新，由 Netlify 部署状态决定；将文件提交到 GitHub 本身不会自动修改 Netlify 上线版本。
+- `busvisa.netlify.app` 的内容是否更新，由 Netlify 部署状态决定；将文件提交到 GitHub 本身不会自动修改 Netlify 上线版本。
 
 ## 数据来源 / Credits
 
