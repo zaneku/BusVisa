@@ -1,3 +1,4 @@
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { command, digest, REDEEM, CHECK_SESSION } from '../lib/store.mjs';
@@ -31,6 +32,63 @@ export default async function handler(request, context = {}) {
     const pathname = url.pathname;
     const now = Math.floor(Date.now() / 1000);
     const token = sessionToken(request);
+
+    if (pathname === '/api/admin/invites' || /^\/api\/admin\/invites\/[a-f0-9]{64}\/disable$/.test(pathname)) {
+      const auth = await authorizeAdmin(request, context);
+      if (auth !== 200) return reply('', auth, auth === 429 ? { 'Retry-After': '900' } : {});
+
+      if (pathname === '/api/admin/invites' && request.method === 'GET') {
+        const requestedCursor = url.searchParams.get('cursor') || '0';
+        if (!/^\d+$/.test(requestedCursor)) return reply('', 400);
+        const [nextCursor, keys] = await command('SCAN', requestedCursor, 'MATCH', 'busvisa:invite:*', 'COUNT', 50);
+        const values = keys.length ? await command('MGET', ...keys) : [];
+        const invites = keys.flatMap((key, index) => {
+          if (!values[index]) return [];
+          const invite = JSON.parse(values[index]);
+          return [{ id: key.slice('busvisa:invite:'.length), ...invite }];
+        });
+        return reply(JSON.stringify({ invites, cursor: String(nextCursor) }), 200, { 'Content-Type': types['.json'] });
+      }
+
+      if (request.headers.get('origin') !== url.origin) return reply('', 403);
+      if (pathname === '/api/admin/invites' && request.method === 'POST') {
+        if (!request.headers.get('content-type')?.startsWith('application/json')) return reply('', 415);
+        const body = await request.text();
+        if (body.length > 1024) return reply('', 413);
+        let input;
+        try { input = JSON.parse(body); } catch { return reply('', 400); }
+        const maxUses = Number(input.maxUses);
+        const validDays = Number(input.validDays);
+        if (!Number.isSafeInteger(maxUses) || maxUses < 1 || maxUses > 10000 ||
+            !Number.isSafeInteger(validDays) || validDays < 1 || validDays > 365) return reply('', 400);
+        const code = `BV-${randomBytes(18).toString('base64url')}`;
+        const id = digest(code);
+        const expiresAt = now + validDays * 86400;
+        const row = { maxUses, uses: 0, expiresAt, disabled: false };
+        const saved = await command('SET', `busvisa:invite:${id}`, JSON.stringify(row), 'EXAT', expiresAt, 'NX');
+        if (saved !== 'OK') throw new Error('Unable to store invitation');
+        return reply(JSON.stringify({ code, id, ...row }), 201, { 'Content-Type': types['.json'] });
+      }
+
+      const disableMatch = pathname.match(/^\/api\/admin\/invites\/([a-f0-9]{64})\/disable$/);
+      if (disableMatch && request.method === 'POST') {
+        const script = `local v=redis.call('GET',KEYS[1]);if not v then return 0 end;local r=cjson.decode(v);r.disabled=true;redis.call('SET',KEYS[1],cjson.encode(r),'KEEPTTL');return 1`;
+        const disabled = await command('EVAL', script, 1, `busvisa:invite:${disableMatch[1]}`);
+        return disabled ? reply(null, 204) : reply('', 404);
+      }
+
+      return reply('', 405, { Allow: pathname === '/api/admin/invites' ? 'GET, POST' : 'POST' });
+    }
+
+    if (pathname === '/admin' || pathname === '/admin/' || pathname === '/admin.html') {
+      if (!['GET', 'HEAD'].includes(request.method)) return reply('', 405, { Allow: 'GET, HEAD' });
+      return reply(request.method === 'HEAD' ? null : await readFile(path.resolve('public/admin.html')), 200, { 'Content-Type': types['.html'] });
+    }
+
+    if (pathname === '/admin.js') {
+      if (!['GET', 'HEAD'].includes(request.method)) return reply('', 405, { Allow: 'GET, HEAD' });
+      return reply(request.method === 'HEAD' ? null : await readFile(path.resolve('public/admin.js')), 200, { 'Content-Type': types['.js'] });
+    }
 
     if (pathname === '/api/invite/redeem') {
       if (request.method !== 'POST') return reply('', 405, { Allow: 'POST' });
@@ -91,6 +149,20 @@ export default async function handler(request, context = {}) {
   }
 }
 
+async function authorizeAdmin(request, context) {
+  const expected = process.env.INVITE_ADMIN_TOKEN || '';
+  const supplied = request.headers.get('authorization')?.match(/^Bearer (.+)$/)?.[1] || '';
+  const expectedDigest = Buffer.from(digest(`admin:${expected}`), 'hex');
+  const suppliedDigest = Buffer.from(digest(`admin:${supplied}`), 'hex');
+  const valid = expected.length >= 32 && timingSafeEqual(expectedDigest, suppliedDigest);
+  if (valid) return 200;
+
+  const rateKey = `busvisa:admin-fail:${digest(context.ip || 'unknown')}`;
+  const attempts = await command('INCR', rateKey);
+  if (attempts === 1) await command('EXPIRE', rateKey, 900);
+  return attempts > 10 ? 429 : 401;
+}
+
 function proxyUrl(pathname) {
   if (['/policy-api/index.json', '/policy-api/visa-matrix.csv'].includes(pathname)) {
     return `https://travelrequirements.info/data/${pathname.split('/').pop()}`;
@@ -103,3 +175,4 @@ function proxyUrl(pathname) {
   }
   return null;
 }
+
