@@ -1,0 +1,192 @@
+{
+  "version": "2026-11-07-curated-1",
+  "purpose": "Selected official-source-based third-country visa exemptions for CN ordinary passport. Always confirm for exact itinerary.",
+  "rules": [
+    {
+      "passport": "CN",
+      "destination": "MX",
+      "issuers": [
+        "US",
+        "CA",
+        "JP",
+        "SCHENGEN",
+        "GB"
+      ],
+      "stay": "最长180天（以入境决定为准）",
+      "minRemainingDays": 0,
+      "conditions": "持有效的美国、加拿大、日本、英国或申根签证，符合旅游等非有偿活动条件。",
+      "source": "https://www.gob.mx/sre/acciones-y-programas/motivo-de-viaje-turismo",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "PA",
+      "issuers": [
+        "US",
+        "CA",
+        "JP",
+        "KR",
+        "SCHENGEN",
+        "GB"
+      ],
+      "stay": "30天",
+      "conditions": "2024年第196号行政令规定持有效指定国家签证可豁免巴拿马签证。部分领事网页仍列旧的多次/使用规定；请按最新法规和承运人要求核验。通常另需返程机票、500美元经济能力证明及护照有效期要求。",
+      "source": "https://www.migracion.gob.pa/plantilla-tramite-migratorio-v-tet-variante-273-borrador-2/",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "CL",
+      "issuers": [
+        "US",
+        "CA"
+      ],
+      "stay": "最长90天",
+      "minRemainingDays": 180,
+      "conditions": "持有效期剩余至少6个月的美/加签证；美国C类过境签不适用。旅游访问不可从事有偿工作。",
+      "source": "https://www.chile.gob.cl/beijing/noticias/visa-de-estados-unidos-o-canada",
+      "reviewed": "2026-11-07",
+      "allowedCategories": [
+        "visitor",
+        "business"
+      ]
+    },
+    {
+      "passport": "CN",
+      "destination": "PE",
+      "issuers": [
+        "US",
+        "CA",
+        "SCHENGEN",
+        "GB"
+      ],
+      "stay": "一年内累计最多180天（以边检为准）",
+      "minRemainingDays": 180,
+      "conditions": "美/加/英/申根签证在入境时须至少剩余6个月有效期；适用于旅游/短期商务。",
+      "source": "https://www.gob.pe/en/36240-apply-for-a-tourist-visa-to-enter-peru?child=113898",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "BZ",
+      "issuers": [
+        "US",
+        "CA",
+        "SCHENGEN"
+      ],
+      "multiple": true,
+      "stay": "通常30天",
+      "conditions": "持符合伯利兹要求的有效多次入境美/加/申根签证；需确认入境次数与护照有效期。",
+      "source": "https://immigration.gov.bz/visa/visa-who-qualify/",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "CY",
+      "issuers": [
+        "SCHENGEN"
+      ],
+      "multiple": false,
+      "stay": "90天/180天",
+      "conditions": "通常需有效双次或多次申根C签，或符合适用条件的D类长期签证；须进一步核对塞浦路斯官方适用范围、入境次数。",
+      "source": "https://www.gov.cy/mfa/en/documents/categories-of-persons-and-countries-whose-nationals-do-not-require-a-visa/",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "ME",
+      "issuers": [
+        "US",
+        "CA",
+        "JP",
+        "SCHENGEN"
+      ],
+      "stay": "通常最多30天",
+      "conditions": "凭有效指定国家签证入境黑山，实际期限不得超过签证剩余有效期。",
+      "source": "https://www.gov.me/en/article/visas",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "MK",
+      "issuers": [
+        "SCHENGEN"
+      ],
+      "multiple": true,
+      "stay": "每次最多15天",
+      "conditions": "符合北马其顿规则的多次入境申根签证，通常须在计划离境后继续有效至少5天。",
+      "source": "https://mfa.gov.mk/en-GB/konzularni-uslugi/informacii-za-vlez-vo-rsm",
+      "reviewed": "2026-11-07",
+      "allowedCategories": [
+        "visitor",
+        "business",
+        "other"
+      ]
+    },
+    {
+      "passport": "CN",
+      "destination": "CO",
+      "issuers": [
+        "US",
+        "SCHENGEN"
+      ],
+      "minRemainingDays": 180,
+      "stay": "通常最多90天",
+      "conditions": "美/申根签证在抵达时通常须至少剩余180天。",
+      "source": "https://www.cancilleria.gov.co/atencion-y-servicio-al-ciudadano/tramites-y-servicios/visa/necesito-un-visa",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "DO",
+      "issuers": [
+        "US",
+        "CA",
+        "SCHENGEN"
+      ],
+      "stay": "通常30天",
+      "conditions": "持符合规定的有效美/加/申根签证，旅游目的入境；完成适用的电子入境登记。",
+      "source": "https://migracion.gob.do/",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "AR",
+      "issuers": [
+        "US"
+      ],
+      "stay": "通常最长30天",
+      "conditions": "中国普通护照持符合阿根廷规定的美国签证可获短期便利，具体签证类别及入境条件需向阿根廷官方核实。",
+      "source": "https://www.boletinoficial.gov.ar/detalleAviso/primera/328606/20250721",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "GE",
+      "issuers": [
+        "US",
+        "CA",
+        "JP",
+        "KR",
+        "SCHENGEN"
+      ],
+      "stay": "持签条件下最长90天/180天",
+      "conditions": "中国护照本身已有短期免签；持指定国家有效签证时可能适用较长停留额度，应以格鲁吉亚边检规定为准。",
+      "source": "https://www.evisa.gov.ge/GeoVisa/en/VisaApp",
+      "reviewed": "2026-11-07"
+    },
+    {
+      "passport": "CN",
+      "destination": "MD",
+      "issuers": [
+        "US",
+        "CA",
+        "SCHENGEN"
+      ],
+      "stay": "通常最多90天/180天",
+      "conditions": "第三国签证豁免需满足摩尔多瓦移民规则；过境签证可能不适用。",
+      "source": "https://www.mfa.gov.md/ro/content/regimul-de-vize",
+      "reviewed": "2026-11-07"
+    }
+  ]
+}
