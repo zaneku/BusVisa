@@ -2,6 +2,18 @@
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+
+# Private invitation exports
+invite-codes*.json
+invite-codes*.csv
+invite-codes*.txt
 
 # Dependencies, deployment state, and logs
 node_modules/

@@ -6,7 +6,7 @@ BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已
 
 当前网站采用 Netlify Functions 和 Upstash Redis 验证邀请码、管理会话。部署入口位于 `server-beta/`。
 
-[访问网站](https://busvisa.netlify.app/) · [GitHub 仓库](https://github.com/zaneku/BusVisa)
+[访问网站](https://busvisa.netlify.app/) · [GitHub 仓库](https://github.com/zaneku/BusVisa) · [版本历史](CHANGELOG.md)
 
 ## 主要功能 / Features
 
@@ -61,53 +61,23 @@ BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已
 
 变量值只填写值本身，去掉首尾引号和空白。更新 Netlify 环境变量后重新部署，使函数使用新配置。
 
-## 邀请码管理 / Invitation management
-
-本机需要 Node.js 22 或更高版本。在 `server-beta/` 下创建 `.env`，使用与目标 Netlify 部署相同的一组配置。下面仅为占位示例。
-
-```dotenv
-UPSTASH_REDIS_REST_URL=https://YOUR-DATABASE.upstash.io
-UPSTASH_REDIS_REST_TOKEN=YOUR-SERVER-ONLY-TOKEN
-INVITE_HASH_SECRET=REPLACE_WITH_AT_LEAST_32_RANDOM_CHARACTERS
-```
-
-在 `server-beta/` 目录中运行以下命令，生成有效 14 天、允许激活 1 次的邀请码。
-
-```sh
-npm run invite -- create 1 14
-```
-
-`create` 后的两个数字依次为最大激活次数和有效天数。输出中的 `code` 私下发给受邀用户，`id` 留作后续管理。
-
-```sh
-# 查询激活次数、有效期和停用状态
-npm run invite -- status <id>
-
-# 停用邀请码及其关联会话的后续访问
-npm run invite -- disable <id>
-```
-
-生成随机密钥可使用以下命令。保存后，将同一密钥填写到本机 `.env` 和对应 Netlify 部署的环境变量中。
-
-```sh
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
 ### 敏感配置
 
 数据库 Token、`INVITE_HASH_SECRET`、真实邀请码和本机 `.env` 应保密。数据库连接配置保存在 Netlify 环境变量和本机配置中。
 
-根目录 `.gitignore` 已覆盖 `.env`、`.env.*`、依赖目录、Netlify 本地状态和日志，并允许提交仅含占位内容的 `.env.example`。通过 GitHub 网页手动上传时，仍需自行检查所选文件。
+根目录 `.gitignore` 已覆盖环境文件、常见私钥文件、依赖目录、Netlify 本地状态、日志和按 `invite-codes*` 命名的邀请码导出，并允许提交仅含占位内容的 `.env.example`。通过 GitHub 网页手动上传时，仍需自行检查所选文件。
 
 ## 项目目录 / Structure
 
 ```text
 .gitignore
 README.md
+CHANGELOG.md
 THIRD_PARTY_NOTICES.md
 server-beta/
 ├── netlify.toml                  # Netlify 构建和路由配置
-├── package.json                  # 测试与邀请码管理命令
+├── package.json                  # 测试与内测维护命令
+├── .env.example                  # 占位配置模板
 ├── DEPLOY.md                     # 部署与验收说明
 ├── public/                       # 公开的邀请码页、样式与图标
 ├── private/                      # 经网关验证后返回的应用与数据
@@ -121,7 +91,7 @@ server-beta/
 ├── netlify/
 │   ├── functions/gateway.mjs     # 邀请码验证、会话检查和资源访问
 │   └── lib/store.mjs             # Redis 请求及原子计数脚本
-├── scripts/invite.mjs            # 邀请码生成、查询和停用
+├── scripts/invite.mjs            # 内测维护工具
 └── tests/gateway.test.mjs        # 网关回归检查
 ```
 
@@ -137,7 +107,7 @@ npm test
 
 当前包含 12 项自动检查，覆盖邀请码页面、旧登录标记、受限资源、会话检查、重复请求、限流响应、数据库故障及路径限制，数据库响应由测试模拟。
 
-本次上线已完成真实邀请码生成及登录，维护者已确认地图和站内功能正常。本地验证还包含函数打包、打包后页面读取以及在模拟 Redis 下执行 Lua 名额计数脚本。旧设备缓存迁移、长时间运行和不同移动浏览器仍需持续验证。
+本次上线已完成内测登录验证，维护者已确认地图和站内功能正常。本地验证还包含函数打包、打包后页面读取以及在模拟 Redis 下执行 Lua 名额计数脚本。旧设备缓存迁移、长时间运行和不同移动浏览器仍需持续验证。
 
 ## 数据来源 / Credits
 
@@ -158,20 +128,4 @@ npm test
 
 ## 更新记录 / Changelog
 
-### v0.3.2 服务端邀请码升级
-
-- 接入 Netlify Functions 与 Upstash Redis，支持邀请码有效期、激活次数、停用和服务端会话检查。
-- 对受限页面、应用数据和同源代理进行访问验证，加入邀请码尝试限流。
-- 移除应用离线资源缓存，提供旧服务工作线程迁移逻辑。
-- 配置 GitHub `main` 自动部署工作流，补充本机敏感配置忽略规则。
-
-### v0.3.2 设置与外观
-
-- 在签证页设置中整合浅色、深色、跟随系统、四语言和关于信息。
-- 补充四语言使用说明及未成年人提示。
-
-### v0.3.0 地图与搜索
-
-- 修复护照及签发地列表截断、目的地搜索数量限制和移动端滚动问题。
-- 调整入境方式显示、签证类型去重及多语言搜索，沿用 `va.*` 本地记录。
-
+完整版本功能与仓库维护记录见 [版本历史](CHANGELOG.md)。
