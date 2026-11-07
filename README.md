@@ -39,7 +39,7 @@ BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已
 - **Natural Earth**，提供世界地图轮廓。[项目网站](https://www.naturalearthdata.com/)
 - **Passport Index Data（imorte）**，护照数据参考。[项目仓库](https://github.com/imorte/passport-index-data)
 
-第三方归属与授权信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。原型阶段曾参考 `ysu-client` 的 Web 与 Capacitor 架构思路。项目专属代码的授权声明见 [LICENSE](server-beta/private/LICENSE)。
+第三方归属与授权信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。项目专属代码的授权声明见 [LICENSE](server-beta/private/LICENSE)。
 
 ## 使用说明与免责声明 / Usage notes
 
