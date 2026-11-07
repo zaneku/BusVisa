@@ -4,7 +4,7 @@
 
 Netlify 通过 `server-beta/netlify/functions/gateway.mjs` 检查会话后返回受限资源，构建入口为 `server-beta/`。
 
-- [项目首页与邀请码管理](../../README.md)
+- [项目首页与使用说明](../../README.md)
 - [部署及验收说明](../DEPLOY.md)
 - [版本历史](../../CHANGELOG.md)
 - [第三方归属与授权](THIRD_PARTY_NOTICES.md)

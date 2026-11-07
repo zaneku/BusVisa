@@ -16,7 +16,6 @@ UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
 INVITE_HASH_SECRET
 
-本机生成邀请码时，从 server-beta/.env 读取同一组配置。
 真实凭据和邀请码应保密，网页手动上传时须检查所选文件。
 
 完整操作步骤见上级目录的 DEPLOY.md 和仓库根目录的 README.md。

@@ -61,38 +61,6 @@ BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已
 
 变量值只填写值本身，去掉首尾引号和空白。更新 Netlify 环境变量后重新部署，使函数使用新配置。
 
-## 邀请码管理 / Invitation management
-
-本机需要 Node.js 22 或更高版本。在 `server-beta/` 下创建 `.env`，使用与目标 Netlify 部署相同的一组配置。下面仅为占位示例。
-
-```dotenv
-UPSTASH_REDIS_REST_URL=https://YOUR-DATABASE.upstash.io
-UPSTASH_REDIS_REST_TOKEN=YOUR-SERVER-ONLY-TOKEN
-INVITE_HASH_SECRET=REPLACE_WITH_AT_LEAST_32_RANDOM_CHARACTERS
-```
-
-在 `server-beta/` 目录中运行以下命令，生成有效 14 天、允许激活 1 次的邀请码。
-
-```sh
-npm run invite -- create 1 14
-```
-
-`create` 后的两个数字依次为最大激活次数和有效天数。输出中的 `code` 私下发给受邀用户，`id` 留作后续管理。
-
-```sh
-# 查询激活次数、有效期和停用状态
-npm run invite -- status <id>
-
-# 停用邀请码及其关联会话的后续访问
-npm run invite -- disable <id>
-```
-
-生成随机密钥可使用以下命令。保存后，将同一密钥填写到本机 `.env` 和对应 Netlify 部署的环境变量中。
-
-```sh
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
 ### 敏感配置
 
 数据库 Token、`INVITE_HASH_SECRET`、真实邀请码和本机 `.env` 应保密。数据库连接配置保存在 Netlify 环境变量和本机配置中。
@@ -108,7 +76,7 @@ CHANGELOG.md
 THIRD_PARTY_NOTICES.md
 server-beta/
 ├── netlify.toml                  # Netlify 构建和路由配置
-├── package.json                  # 测试与邀请码管理命令
+├── package.json                  # 测试与内测维护命令
 ├── .env.example                  # 占位配置模板
 ├── DEPLOY.md                     # 部署与验收说明
 ├── public/                       # 公开的邀请码页、样式与图标
@@ -123,7 +91,7 @@ server-beta/
 ├── netlify/
 │   ├── functions/gateway.mjs     # 邀请码验证、会话检查和资源访问
 │   └── lib/store.mjs             # Redis 请求及原子计数脚本
-├── scripts/invite.mjs            # 邀请码生成、查询和停用
+├── scripts/invite.mjs            # 内测维护工具
 └── tests/gateway.test.mjs        # 网关回归检查
 ```
 
@@ -139,7 +107,7 @@ npm test
 
 当前包含 12 项自动检查，覆盖邀请码页面、旧登录标记、受限资源、会话检查、重复请求、限流响应、数据库故障及路径限制，数据库响应由测试模拟。
 
-本次上线已完成真实邀请码生成及登录，维护者已确认地图和站内功能正常。本地验证还包含函数打包、打包后页面读取以及在模拟 Redis 下执行 Lua 名额计数脚本。旧设备缓存迁移、长时间运行和不同移动浏览器仍需持续验证。
+本次上线已完成内测登录验证，维护者已确认地图和站内功能正常。本地验证还包含函数打包、打包后页面读取以及在模拟 Redis 下执行 Lua 名额计数脚本。旧设备缓存迁移、长时间运行和不同移动浏览器仍需持续验证。
 
 ## 数据来源 / Credits
 
