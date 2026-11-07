@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#f4f7fb" />
+  <title>邀请码管理 · BusVisa</title>
+  <style>
+    :root{color-scheme:light;--ink:#19293d;--muted:#68798e;--line:#dce4ed;--surface:#fff;--page:#f4f7fb;--blue:#1765b2;--green:#087f68;--red:#b63d42;--shadow:0 12px 28px #152c4710;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-size:14px}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.6}main{width:min(100%,1040px);margin:0 auto;padding:34px 24px 56px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:#e3effb;color:var(--blue);font-weight:800}.brand h1{font-size:18px;line-height:1.2;margin:0}.brand p{margin:4px 0 0;font-size:12px;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:9px}.quiet-button,.primary-button,.danger-button{min-height:38px;padding:0 13px;border-radius:7px;border:1px solid transparent;font-weight:650}.quiet-button{border-color:var(--line);background:#fff;color:#44566d}.primary-button{background:var(--blue);color:#fff}.danger-button{border-color:#f0d0d1;background:#fff7f7;color:var(--red)}.login-panel,.panel{background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow)}.login-panel{max-width:440px;margin:70px auto;padding:25px}.login-panel h2,.panel h2{font-size:16px;margin:0}.login-panel p{color:var(--muted);line-height:1.6;margin:8px 0 18px}.field{display:grid;gap:6px;margin-bottom:15px}.field label{font-size:12px;font-weight:650;color:#42556c}.field input{width:100%;height:40px;border:1px solid #cbd6e1;border-radius:6px;background:#fff;padding:0 11px;color:var(--ink)}.field input:focus{outline:3px solid #1765b225;border-color:var(--blue)}.login-panel .primary-button{width:100%}.notice{min-height:21px;margin:10px 0 0;color:var(--red);font-size:12px}.workspace[hidden],.login-panel[hidden]{display:none}.grid{display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:16px;align-items:start}.panel{padding:19px}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.panel-heading p{margin:5px 0 0;color:var(--muted);font-size:12px}.number-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.number-grid .field{min-width:0}.form-submit{width:100%;margin-top:3px}.created{margin-top:15px;border:1px solid #a9dbc9;background:#f0faf6;border-radius:7px;padding:12px}.created[hidden]{display:none}.created-label{font-size:11px;font-weight:700;color:var(--green)}.code-row{display:flex;align-items:center;gap:8px;margin-top:7px}.code{min-width:0;flex:1;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;font-weight:700}.created-meta{margin:8px 0 0;color:#547264;font-size:11px}.panel-note{color:var(--muted);font-size:11px;line-height:1.55;margin:13px 0 0}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 9px;border-top:1px solid #e8edf2;text-align:left;vertical-align:middle}th{border-top:0;color:#63758a;font-size:11px;font-weight:700;white-space:nowrap}.id-cell{max-width:215px;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;color:#5f7186}.status{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.status::before{content:"";width:7px;height:7px;border-radius:50%;background:#8290a0}.status.active::before{background:#16866c}.status.used::before{background:#bb822d}.status.expired::before,.status.disabled::before{background:#b84a4d}.empty-state{padding:34px 12px;text-align:center;color:var(--muted);border-top:1px solid #e8edf2}.table-actions{white-space:nowrap}.table-actions button{min-height:30px;padding:0 8px;font-size:11px}.load-more{display:block;margin:15px auto 0}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}.toolbar span{font-size:11px;color:var(--muted)}.error-banner{margin:0 0 15px;padding:10px 12px;border:1px solid #f0d0d1;border-radius:7px;background:#fff7f7;color:var(--red);font-size:12px}.error-banner[hidden]{display:none}.footer{margin-top:17px;color:#8290a0;font-size:11px}
+    @media(max-width:720px){main{padding:21px 14px 40px}.topbar{align-items:flex-start}.brand p{max-width:190px}.grid{grid-template-columns:1fr}.login-panel{margin:58px auto}.panel{padding:16px}.top-actions{gap:6px}.quiet-button,.primary-button,.danger-button{padding:0 10px}.top-actions .quiet-button{font-size:12px}th,td{padding:10px 7px}.id-cell{max-width:125px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">BV</div><div><h1>邀请码管理</h1><p>BusVisa · 内测访问</p></div></div>
+      <div id="top-actions" class="top-actions" hidden><button id="refresh-button" class="quiet-button" type="button">刷新</button><button id="logout-button" class="quiet-button" type="button">退出</button></div>
+    </header>
+
+    <section id="login-panel" class="login-panel" aria-labelledby="login-title">
+      <h2 id="login-title">管理员登录</h2>
+      <p>输入 Netlify 中配置的管理员密钥。密钥只保留在当前页面内存，刷新后需要重新登录。</p>
+      <form id="login-form">
+        <div class="field"><label for="admin-token">管理员密钥</label><input id="admin-token" type="password" autocomplete="current-password" required minlength="32" /></div>
+        <button id="login-button" class="primary-button" type="submit">登录</button>
+      </form>
+      <p id="login-notice" class="notice" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="workspace" class="workspace" hidden>
+      <div id="global-error" class="error-banner" role="alert" hidden></div>
+      <div class="grid">
+        <section class="panel" aria-labelledby="create-title">
+          <div class="panel-heading"><div><h2 id="create-title">新建邀请码</h2><p>设置可激活次数和有效天数</p></div></div>
+          <form id="create-form">
+            <div class="number-grid">
+              <div class="field"><label for="max-uses">激活次数</label><input id="max-uses" name="maxUses" type="number" min="1" max="10000" value="1" required /></div>
+              <div class="field"><label for="valid-days">有效天数</label><input id="valid-days" name="validDays" type="number" min="1" max="365" value="14" required /></div>
+            </div>
+            <button id="create-button" class="primary-button form-submit" type="submit">生成邀请码</button>
+          </form>
+          <div id="created-result" class="created" hidden>
+            <div class="created-label">邀请码已创建 · 仅此处显示</div>
+            <div class="code-row"><code id="created-code" class="code"></code><button id="copy-code" class="quiet-button" type="button">复制</button></div>
+            <p id="created-meta" class="created-meta"></p>
+          </div>
+          <p class="panel-note">邀请码只在创建成功后显示一次。请及时复制并私下发送给受邀用户。</p>
+        </section>
+
+        <section class="panel" aria-labelledby="list-title">
+          <div class="panel-heading"><div><h2 id="list-title">邀请码记录</h2><p>查看激活用量、有效期及停用状态</p></div></div>
+          <div class="toolbar"><span id="list-count">尚未载入记录</span><span>新记录可能需点击刷新查看</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">管理 ID</th><th scope="col">使用</th><th scope="col">到期时间</th><th scope="col">状态</th><th scope="col">操作</th></tr></thead>
+              <tbody id="invite-rows"></tbody>
+            </table>
+            <div id="empty-state" class="empty-state" hidden>暂无邀请码记录</div>
+          </div>
+          <button id="load-more" class="quiet-button load-more" type="button" hidden>加载更多</button>
+        </section>
+      </div>
+      <p class="footer">停用后，关联会话的后续受限访问也会失效。</p>
+    </section>
+  </main>
+  <script src="/admin.js" defer></script>
+</body>
+</html>
+
