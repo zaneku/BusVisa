@@ -151,10 +151,11 @@ export default async function handler(request, context = {}) {
 
 async function authorizeAdmin(request, context) {
   const expected = process.env.INVITE_ADMIN_TOKEN || '';
+  if (expected.length < 32) return 503;
   const supplied = request.headers.get('authorization')?.match(/^Bearer (.+)$/)?.[1] || '';
   const expectedDigest = Buffer.from(digest(`admin:${expected}`), 'hex');
   const suppliedDigest = Buffer.from(digest(`admin:${supplied}`), 'hex');
-  const valid = expected.length >= 32 && timingSafeEqual(expectedDigest, suppliedDigest);
+  const valid = timingSafeEqual(expectedDigest, suppliedDigest);
   if (valid) return 200;
 
   const rateKey = `busvisa:admin-fail:${digest(context.ip || 'unknown')}`;
