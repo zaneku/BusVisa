@@ -6,7 +6,7 @@ BusVisa 是面向移动浏览器的全球签证地图。根据所选护照和已
 
 当前网站采用 Netlify Functions 和 Upstash Redis 验证邀请码、管理会话。部署入口位于 `server-beta/`。
 
-[访问网站](https://busvisa.netlify.app/) · [GitHub 仓库](https://github.com/zaneku/BusVisa)
+[访问网站](https://busvisa.netlify.app/) · [GitHub 仓库](https://github.com/zaneku/BusVisa) · [版本历史](CHANGELOG.md)
 
 ## 主要功能 / Features
 
@@ -97,17 +97,19 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 数据库 Token、`INVITE_HASH_SECRET`、真实邀请码和本机 `.env` 应保密。数据库连接配置保存在 Netlify 环境变量和本机配置中。
 
-根目录 `.gitignore` 已覆盖 `.env`、`.env.*`、依赖目录、Netlify 本地状态和日志，并允许提交仅含占位内容的 `.env.example`。通过 GitHub 网页手动上传时，仍需自行检查所选文件。
+根目录 `.gitignore` 已覆盖环境文件、常见私钥文件、依赖目录、Netlify 本地状态、日志和按 `invite-codes*` 命名的邀请码导出，并允许提交仅含占位内容的 `.env.example`。通过 GitHub 网页手动上传时，仍需自行检查所选文件。
 
 ## 项目目录 / Structure
 
 ```text
 .gitignore
 README.md
+CHANGELOG.md
 THIRD_PARTY_NOTICES.md
 server-beta/
 ├── netlify.toml                  # Netlify 构建和路由配置
 ├── package.json                  # 测试与邀请码管理命令
+├── .env.example                  # 占位配置模板
 ├── DEPLOY.md                     # 部署与验收说明
 ├── public/                       # 公开的邀请码页、样式与图标
 ├── private/                      # 经网关验证后返回的应用与数据
@@ -158,20 +160,4 @@ npm test
 
 ## 更新记录 / Changelog
 
-### v0.3.2 服务端邀请码升级
-
-- 接入 Netlify Functions 与 Upstash Redis，支持邀请码有效期、激活次数、停用和服务端会话检查。
-- 对受限页面、应用数据和同源代理进行访问验证，加入邀请码尝试限流。
-- 移除应用离线资源缓存，提供旧服务工作线程迁移逻辑。
-- 配置 GitHub `main` 自动部署工作流，补充本机敏感配置忽略规则。
-
-### v0.3.2 设置与外观
-
-- 在签证页设置中整合浅色、深色、跟随系统、四语言和关于信息。
-- 补充四语言使用说明及未成年人提示。
-
-### v0.3.0 地图与搜索
-
-- 修复护照及签发地列表截断、目的地搜索数量限制和移动端滚动问题。
-- 调整入境方式显示、签证类型去重及多语言搜索，沿用 `va.*` 本地记录。
-
+完整版本功能与仓库维护记录见 [版本历史](CHANGELOG.md)。

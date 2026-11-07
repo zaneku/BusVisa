@@ -1,35 +1,23 @@
-BusVisa v0.3.2 — Netlify deployment bundle
+BusVisa v0.3.2 服务端邀请码版
 
-Official site: https://busvisa.netlify.app/
+当前部署入口为仓库中的 server-beta 目录。
 
-Release highlights
-- Map and Visa are the only bottom tabs.
-- About BusVisa is at the bottom of Visa.
-- Four interface languages: 简体中文, 繁體中文（香港）, 繁體中文（台灣）, English.
-- Language choices are kept on this device.
-- Multilingual passport/visa issuing country search in simplified/traditional Chinese and English.
-- More detailed visa-type lists across issuers; Schengen A/C/D appears under all Schengen issuing states.
-- Current app icon included as PWA icon, iPhone touch icon and favicon.
-- Visa validity dates are not collected. Third-country visa privileges are advisory/conditional.
-- Reference visa-on-arrival fees and CNY FX display, with source dates when available.
+Netlify 构建配置
+Branch to deploy = main
+Base directory = server-beta
+Build command = 留空
+Publish directory = public
+Functions directory = netlify/functions
 
-Upload instructions (update the EXISTING website, not a new Netlify site)
-1. Log in to app.netlify.com and select the visaatlas site.
-2. Open Deploys and use the manual production deploy area.
-3. Upload the folder containing index.html and its files in the folder ROOT.
-   Do NOT upload a parent folder in which index.html is nested.
-4. Wait until Published, then open https://busvisa.netlify.app/.
-5. On iPhone close and reopen the home-screen web app. If old assets persist, try Safari reload twice, without clearing site data.
+使用 Netlify Git 构建或支持函数打包的 CLI 部署流程。
+环境变量须在目标部署上下文中配置，作用域包含 Functions。
 
-Do not delete Safari website data; it may hold stored visa information.
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+INVITE_HASH_SECRET
 
-Technical
-- Web/PWA static site with same-origin Netlify proxy rules (_redirects).
-- Entry policy sync depends on the external open dataset, and may lag official changes.
-- Fee and FX references are not official guarantees of price or admission.
-- Data citation: TravelRequirements.info — Entry Requirements Dataset, AXG Sp. z o.o. (CC BY 4.0).
-- FX reference: Frankfurter (daily indicative, not transaction live rates).
-- Schengen visa A is airport transit and does not grant entry to Schengen territory.
-- Visa types can differ by nationality, purpose and issuing authority. For incomplete catalogs, manually enter the visa label.
+本机生成邀请码时，从 server-beta/.env 读取同一组配置。
+真实凭据和邀请码应保密，网页手动上传时须检查所选文件。
 
-Version 0.3.2: Theme Settings (follow system/light/dark), About inside Settings, full 4-language disclaimers including minors/guardians. Internal policy API diagnostic link removed.
+完整操作步骤见上级目录的 DEPLOY.md 和仓库根目录的 README.md。
+版本历史见仓库根目录的 CHANGELOG.md。
