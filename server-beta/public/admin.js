@@ -2,7 +2,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const state = { token: '', cursor: '0', count: 0, busy: false };
+  const state = { token: '', cursor: '0', count: 0, busy: false, seenInviteIds: new Set() };
   const loginPanel = $('login-panel');
   const workspace = $('workspace');
   const rowHost = $('invite-rows');
@@ -84,12 +84,18 @@
       if (reset) {
         state.cursor = '0';
         state.count = 0;
+        state.seenInviteIds.clear();
         rowHost.replaceChildren();
       }
       const result = await api(`/api/admin/invites?cursor=${encodeURIComponent(state.cursor)}`);
-      const rows = result.invites.map(rowFor);
+      const uniqueInvites = result.invites.filter((invite) => {
+        if (state.seenInviteIds.has(invite.id)) return false;
+        state.seenInviteIds.add(invite.id);
+        return true;
+      });
+      const rows = uniqueInvites.map(rowFor);
       rowHost.append(...rows);
-      state.count += result.invites.length;
+      state.count += uniqueInvites.length;
       state.cursor = result.cursor;
       updateListLabel();
       return true;
