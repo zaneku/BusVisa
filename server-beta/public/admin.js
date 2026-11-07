@@ -2,7 +2,8 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const state = { token: '', cursor: '0', count: 0, busy: false, seenInviteIds: new Set() };
+  const PAGE_SIZE = 5;
+  const state = { token: '', cursor: '0', complete: false, page: 0, rows: [], busy: false, seenInviteIds: new Set() };
   const loginPanel = $('login-panel');
   const workspace = $('workspace');
   const rowHost = $('invite-rows');
@@ -40,6 +41,9 @@
 
   function rowFor(invite) {
     const row = document.createElement('tr');
+    row.dataset.inviteId = invite.id;
+    row.dataset.createdAt = String(invite.createdAt || 0);
+    row.dataset.expiresAt = String(invite.expiresAt);
     const id = document.createElement('td');
     id.className = 'id-cell';
     id.textContent = invite.id;
@@ -113,35 +117,65 @@
     return row;
   }
 
-  function updateListLabel() {
-    $('list-count').textContent = state.count ? `已载入 ${state.count} 条记录` : '暂无邀请码记录';
-    $('empty-state').hidden = state.count > 0;
-    $('load-more').hidden = state.cursor === '0';
+  function sortRows(rows) {
+    const byExpiry = $('invite-sort').value === 'expiry';
+    rows.sort((a, b) => {
+      if (byExpiry) {
+        const aExpiry = Number(a.dataset.expiresAt) === 0 ? Infinity : Number(a.dataset.expiresAt);
+        const bExpiry = Number(b.dataset.expiresAt) === 0 ? Infinity : Number(b.dataset.expiresAt);
+        if (aExpiry !== bExpiry) return bExpiry - aExpiry;
+      }
+      return Number(b.dataset.createdAt) - Number(a.dataset.createdAt) || a.dataset.inviteId.localeCompare(b.dataset.inviteId);
+    });
   }
 
-  async function loadInvites(reset = false) {
+  function renderPage() {
+    const start = state.page * PAGE_SIZE;
+    rowHost.replaceChildren(...state.rows.slice(start, start + PAGE_SIZE));
+    const pageCount = Math.max(1, Math.ceil(state.rows.length / PAGE_SIZE));
+    $('list-count').textContent = state.rows.length
+      ? `第 ${start + 1}–${Math.min(start + PAGE_SIZE, state.rows.length)} 条${state.complete ? ` · 共 ${state.rows.length} 条` : ''}`
+      : '暂无邀请码记录';
+    $('page-number').textContent = state.complete
+      ? `第 ${state.page + 1} / ${pageCount} 页`
+      : `第 ${state.page + 1} 页`;
+    $('empty-state').hidden = state.rows.length > 0;
+    $('previous-page').disabled = state.busy || state.page === 0;
+    $('next-page').disabled = state.busy || (state.complete && start + PAGE_SIZE >= state.rows.length);
+    $('refresh-button').disabled = state.busy;
+    $('invite-sort').disabled = state.busy;
+  }
+
+  async function loadInvites(reset = false, targetPage = state.page) {
     if (state.busy) return false;
     state.busy = true;
-    $('load-more').disabled = true;
+    renderPage();
     showError('');
+    const token = state.token;
     try {
-      if (reset) {
-        state.cursor = '0';
-        state.count = 0;
-        state.seenInviteIds.clear();
-        rowHost.replaceChildren();
+      const rows = reset ? [] : state.rows.slice();
+      const seenIds = new Set(reset ? [] : state.seenInviteIds);
+      let cursor = reset ? '0' : state.cursor;
+      let complete = reset ? false : state.complete;
+      const page = reset ? 0 : targetPage;
+      // Read and deduplicate the full snapshot before sorting across pages.
+      while (!complete) {
+        const result = await api(`/api/admin/invites?cursor=${encodeURIComponent(cursor)}`);
+        if (token !== state.token) return false;
+        for (const invite of result.invites) {
+          if (seenIds.has(invite.id)) continue;
+          seenIds.add(invite.id);
+          rows.push(rowFor(invite));
+        }
+        cursor = result.cursor;
+        complete = cursor === '0';
       }
-      const result = await api(`/api/admin/invites?cursor=${encodeURIComponent(state.cursor)}`);
-      const uniqueInvites = result.invites.filter((invite) => {
-        if (state.seenInviteIds.has(invite.id)) return false;
-        state.seenInviteIds.add(invite.id);
-        return true;
-      });
-      const rows = uniqueInvites.map(rowFor);
-      rowHost.append(...rows);
-      state.count += uniqueInvites.length;
-      state.cursor = result.cursor;
-      updateListLabel();
+      sortRows(rows);
+      state.rows = rows;
+      state.seenInviteIds = seenIds;
+      state.cursor = cursor;
+      state.complete = complete;
+      state.page = Math.min(page, Math.max(0, Math.ceil(rows.length / PAGE_SIZE) - 1));
       return true;
     } catch (error) {
       showError(error.message);
@@ -149,7 +183,7 @@
       return false;
     } finally {
       state.busy = false;
-      $('load-more').disabled = false;
+      renderPage();
     }
   }
 
@@ -169,7 +203,10 @@
   function logout() {
     state.token = '';
     state.cursor = '0';
-    state.count = 0;
+    state.complete = false;
+    state.page = 0;
+    state.rows = [];
+    state.seenInviteIds.clear();
     rowHost.replaceChildren();
     workspace.hidden = true;
     loginPanel.hidden = false;
@@ -250,6 +287,14 @@
   });
 
   $('refresh-button').addEventListener('click', () => loadInvites(true));
-  $('load-more').addEventListener('click', () => loadInvites(false));
+  $('invite-sort').addEventListener('change', () => {
+    sortRows(state.rows);
+    state.page = 0;
+    renderPage();
+  });
+  $('previous-page').addEventListener('click', () => {
+    if (state.page > 0) loadInvites(false, state.page - 1);
+  });
+  $('next-page').addEventListener('click', () => loadInvites(false, state.page + 1));
   $('logout-button').addEventListener('click', logout);
 })();
